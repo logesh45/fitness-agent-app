@@ -1,0 +1,612 @@
+{
+  "created_at": "2025-03-21T02:18:20.028242",
+  "end_date": "2025-04-11T02:18:20.025033",
+  "id": 2,
+  "plan_data": {
+    "weeks": [
+      {
+        "days": [
+          {
+            "day_number": 1,
+            "exercises": [
+              {
+                "duration": null,
+                "equipment": [
+                  "Dumbbells",
+                  "Yoga Mat"
+                ],
+                "instructions": "Lie on your back on a bench with your feet flat on the floor. Hold a dumbbell in each hand with a neutral grip. Lower the dumbbells to your chest, then press them back up to the starting position.",
+                "name": "Dumbbell Bench Press",
+                "reps": "10-12",
+                "sets": 3,
+                "type": "Strength Training"
+              },
+              {
+                "duration": null,
+                "equipment": [
+                  "Dumbbells"
+                ],
+                "instructions": "Stand with your feet shoulder-width apart, holding a dumbbell in each hand. Bend at the hips, keeping your back straight. Let the dumbbells hang towards the floor. Pull the dumbbells up to your chest, keeping your elbows close to your body.",
+                "name": "Dumbbell Rows",
+                "reps": "10-12",
+                "sets": 3,
+                "type": "Strength Training"
+              },
+              {
+                "duration": null,
+                "equipment": [
+                  "Dumbbells"
+                ],
+                "instructions": "Stand with your feet shoulder-width apart, holding a dumbbell in each hand at shoulder height. Press the dumbbells up overhead, then lower them back down to the starting position.",
+                "name": "Overhead Press",
+                "reps": "10-12",
+                "sets": 3,
+                "type": "Strength Training"
+              },
+              {
+                "duration": null,
+                "equipment": [
+                  "Dumbbells"
+                ],
+                "instructions": "Stand with your feet shoulder-width apart, holding a dumbbell in each hand. Raise your arms out to the sides, keeping your elbows slightly bent. Lower the dumbbells back down to the starting position.",
+                "name": "Lateral Raises",
+                "reps": "12-15",
+                "sets": 3,
+                "type": "Strength Training"
+              },
+              {
+                "duration": null,
+                "equipment": [
+                  "Dumbbells"
+                ],
+                "instructions": "Stand with your feet shoulder-width apart, holding a dumbbell in each hand. Curl the dumbbells up towards your shoulders, keeping your elbows close to your body. Lower the dumbbells back down to the starting position.",
+                "name": "Bicep Curls",
+                "reps": "12-15",
+                "sets": 3,
+                "type": "Strength Training"
+              },
+              {
+                "duration": null,
+                "equipment": [
+                  "Dumbbells"
+                ],
+                "instructions": "Hold a dumbbell in each hand and extend your arms straight above your head, palms facing each other. Lower the dumbbells behind your head by bending your elbows. Extend your arms back to the starting position.",
+                "name": "Triceps Extensions",
+                "reps": "12-15",
+                "sets": 3,
+                "type": "Strength Training"
+              }
+            ],
+            "focus": "Strength Training - Upper Body"
+          },
+          {
+            "day_number": 2,
+            "exercises": [
+              {
+                "duration": "30 seconds",
+                "equipment": [
+                  "Treadmill"
+                ],
+                "instructions": "Warm up for 5 minutes. Sprint at a challenging pace for 30 seconds, followed by 30 seconds of rest or light jogging. Repeat for a total of 6 rounds.",
+                "name": "Treadmill Sprints",
+                "reps": "30 seconds",
+                "sets": 6,
+                "type": "HIIT"
+              },
+              {
+                "duration": null,
+                "equipment": [],
+                "instructions": "Stand with your feet together and arms at your sides. Jump your feet apart while raising your arms overhead. Jump back to the starting position. Repeat.",
+                "name": "Jumping Jacks",
+                "reps": "20",
+                "sets": 3,
+                "type": "HIIT"
+              },
+              {
+                "duration": null,
+                "equipment": [],
+                "instructions": "Run in place, bringing your knees up towards your chest with each step.",
+                "name": "High Knees",
+                "reps": "30 seconds",
+                "sets": 3,
+                "type": "HIIT"
+              },
+              {
+                "duration": null,
+                "equipment": [],
+                "instructions": "Start standing. Squat down and place your hands on the floor. Kick your feet back into a plank position. Do a push-up. Jump your feet back to your hands. Stand up and jump. Repeat.",
+                "name": "Burpees",
+                "reps": "10",
+                "sets": 3,
+                "type": "HIIT"
+              }
+            ],
+            "focus": "HIIT Cardio"
+          },
+          {
+            "day_number": 3,
+            "exercises": [],
+            "focus": "Rest"
+          },
+          {
+            "day_number": 4,
+            "exercises": [
+              {
+                "duration": null,
+                "equipment": [],
+                "instructions": "Stand with your feet shoulder-width apart. Lower your body down by pushing your hips back and bending your knees. Keep your back straight and chest up. Return to the starting position.",
+                "name": "Squats",
+                "reps": "10-12",
+                "sets": 3,
+                "type": "Strength Training"
+              },
+              {
+                "duration": null,
+                "equipment": [],
+                "instructions": "Stand with your feet hip-width apart. Take a step forward with your right foot and lower your body until your right thigh is parallel to the floor. Push off with your right foot to return to the starting position. Repeat on the other side.",
+                "name": "Lunges",
+                "reps": "10-12",
+                "sets": 3,
+                "type": "Strength Training"
+              },
+              {
+                "duration": null,
+                "equipment": [],
+                "instructions": "Lie on your back with your knees bent and feet flat on the floor. Lift your hips off the floor until your body forms a straight line from your shoulders to your knees. Lower your hips back down to the starting position.",
+                "name": "Glute Bridges",
+                "reps": "12-15",
+                "sets": 3,
+                "type": "Strength Training"
+              },
+              {
+                "duration": null,
+                "equipment": [],
+                "instructions": "Stand with your feet hip-width apart. Raise up onto the balls of your feet. Lower your heels back down to the starting position.",
+                "name": "Calf Raises",
+                "reps": "15-20",
+                "sets": 3,
+                "type": "Strength Training"
+              }
+            ],
+            "focus": "Strength Training - Lower Body"
+          },
+          {
+            "day_number": 5,
+            "exercises": [
+              {
+                "duration": "30 minutes",
+                "equipment": [
+                  "Treadmill"
+                ],
+                "instructions": "Jog at a light, conversational pace for 30 minutes.",
+                "name": "Light Jogging",
+                "reps": null,
+                "sets": 1,
+                "type": "Cardio"
+              },
+              {
+                "duration": "15 minutes",
+                "equipment": [
+                  "Yoga Mat"
+                ],
+                "instructions": "Perform a series of stretches, holding each stretch for 30 seconds. Focus on your hamstrings, quads, glutes, and chest.",
+                "name": "Stretching",
+                "reps": null,
+                "sets": 1,
+                "type": "Cardio"
+              }
+            ],
+            "focus": "Active Recovery"
+          }
+        ],
+        "rest_days": [
+          3
+        ],
+        "week_number": 1
+      },
+      {
+        "days": [
+          {
+            "day_number": 1,
+            "exercises": [
+              {
+                "duration": null,
+                "equipment": [
+                  "Dumbbells",
+                  "Yoga Mat"
+                ],
+                "instructions": "Lie on your back on a bench with your feet flat on the floor. Hold a dumbbell in each hand with a neutral grip. Lower the dumbbells to your chest, then press them back up to the starting position.",
+                "name": "Dumbbell Bench Press",
+                "reps": "12-15",
+                "sets": 3,
+                "type": "Strength Training"
+              },
+              {
+                "duration": null,
+                "equipment": [
+                  "Dumbbells"
+                ],
+                "instructions": "Stand with your feet shoulder-width apart, holding a dumbbell in each hand. Bend at the hips, keeping your back straight. Let the dumbbells hang towards the floor. Pull the dumbbells up to your chest, keeping your elbows close to your body.",
+                "name": "Dumbbell Rows",
+                "reps": "12-15",
+                "sets": 3,
+                "type": "Strength Training"
+              },
+              {
+                "duration": null,
+                "equipment": [
+                  "Dumbbells"
+                ],
+                "instructions": "Stand with your feet shoulder-width apart, holding a dumbbell in each hand at shoulder height. Press the dumbbells up overhead, then lower them back down to the starting position.",
+                "name": "Overhead Press",
+                "reps": "12-15",
+                "sets": 3,
+                "type": "Strength Training"
+              },
+              {
+                "duration": null,
+                "equipment": [
+                  "Dumbbells"
+                ],
+                "instructions": "Stand with your feet shoulder-width apart, holding a dumbbell in each hand. Raise your arms out to the sides, keeping your elbows slightly bent. Lower the dumbbells back down to the starting position.",
+                "name": "Lateral Raises",
+                "reps": "15-20",
+                "sets": 3,
+                "type": "Strength Training"
+              },
+              {
+                "duration": null,
+                "equipment": [
+                  "Dumbbells"
+                ],
+                "instructions": "Stand with your feet shoulder-width apart, holding a dumbbell in each hand. Curl the dumbbells up towards your shoulders, keeping your elbows close to your body. Lower the dumbbells back down to the starting position.",
+                "name": "Bicep Curls",
+                "reps": "15-20",
+                "sets": 3,
+                "type": "Strength Training"
+              },
+              {
+                "duration": null,
+                "equipment": [
+                  "Dumbbells"
+                ],
+                "instructions": "Hold a dumbbell in each hand and extend your arms straight above your head, palms facing each other. Lower the dumbbells behind your head by bending your elbows. Extend your arms back to the starting position.",
+                "name": "Triceps Extensions",
+                "reps": "15-20",
+                "sets": 3,
+                "type": "Strength Training"
+              }
+            ],
+            "focus": "Strength Training - Upper Body"
+          },
+          {
+            "day_number": 2,
+            "exercises": [
+              {
+                "duration": "30 seconds",
+                "equipment": [
+                  "Treadmill"
+                ],
+                "instructions": "Warm up for 5 minutes. Sprint at a challenging pace for 30 seconds, followed by 30 seconds of rest or light jogging. Repeat for a total of 8 rounds.",
+                "name": "Treadmill Sprints",
+                "reps": "30 seconds",
+                "sets": 8,
+                "type": "HIIT"
+              },
+              {
+                "duration": null,
+                "equipment": [],
+                "instructions": "Stand with your feet together and arms at your sides. Jump your feet apart while raising your arms overhead. Jump back to the starting position. Repeat.",
+                "name": "Jumping Jacks",
+                "reps": "20",
+                "sets": 4,
+                "type": "HIIT"
+              },
+              {
+                "duration": null,
+                "equipment": [],
+                "instructions": "Run in place, bringing your knees up towards your chest with each step.",
+                "name": "High Knees",
+                "reps": "30 seconds",
+                "sets": 4,
+                "type": "HIIT"
+              },
+              {
+                "duration": null,
+                "equipment": [],
+                "instructions": "Start standing. Squat down and place your hands on the floor. Kick your feet back into a plank position. Do a push-up. Jump your feet back to your hands. Stand up and jump. Repeat.",
+                "name": "Burpees",
+                "reps": "12",
+                "sets": 4,
+                "type": "HIIT"
+              }
+            ],
+            "focus": "HIIT Cardio"
+          },
+          {
+            "day_number": 3,
+            "exercises": [],
+            "focus": "Rest"
+          },
+          {
+            "day_number": 4,
+            "exercises": [
+              {
+                "duration": null,
+                "equipment": [],
+                "instructions": "Stand with your feet shoulder-width apart. Lower your body down by pushing your hips back and bending your knees. Keep your back straight and chest up. Return to the starting position.",
+                "name": "Squats",
+                "reps": "12-15",
+                "sets": 3,
+                "type": "Strength Training"
+              },
+              {
+                "duration": null,
+                "equipment": [],
+                "instructions": "Stand with your feet hip-width apart. Take a step forward with your right foot and lower your body until your right thigh is parallel to the floor. Push off with your right foot to return to the starting position. Repeat on the other side.",
+                "name": "Lunges",
+                "reps": "12-15",
+                "sets": 3,
+                "type": "Strength Training"
+              },
+              {
+                "duration": null,
+                "equipment": [],
+                "instructions": "Lie on your back with your knees bent and feet flat on the floor. Lift your hips off the floor until your body forms a straight line from your shoulders to your knees. Lower your hips back down to the starting position.",
+                "name": "Glute Bridges",
+                "reps": "15-20",
+                "sets": 3,
+                "type": "Strength Training"
+              },
+              {
+                "duration": null,
+                "equipment": [],
+                "instructions": "Stand with your feet hip-width apart. Raise up onto the balls of your feet. Lower your heels back down to the starting position.",
+                "name": "Calf Raises",
+                "reps": "20-25",
+                "sets": 3,
+                "type": "Strength Training"
+              }
+            ],
+            "focus": "Strength Training - Lower Body"
+          },
+          {
+            "day_number": 5,
+            "exercises": [
+              {
+                "duration": "35 minutes",
+                "equipment": [
+                  "Treadmill"
+                ],
+                "instructions": "Jog at a light, conversational pace for 35 minutes.",
+                "name": "Light Jogging",
+                "reps": null,
+                "sets": 1,
+                "type": "Cardio"
+              },
+              {
+                "duration": "15 minutes",
+                "equipment": [
+                  "Yoga Mat"
+                ],
+                "instructions": "Perform a series of stretches, holding each stretch for 30 seconds. Focus on your hamstrings, quads, glutes, and chest.",
+                "name": "Stretching",
+                "reps": null,
+                "sets": 1,
+                "type": "Cardio"
+              }
+            ],
+            "focus": "Active Recovery"
+          }
+        ],
+        "rest_days": [
+          3
+        ],
+        "week_number": 2
+      },
+      {
+        "days": [
+          {
+            "day_number": 1,
+            "exercises": [
+              {
+                "duration": null,
+                "equipment": [
+                  "Dumbbells",
+                  "Yoga Mat"
+                ],
+                "instructions": "Lie on your back on a bench with your feet flat on the floor. Hold a dumbbell in each hand with a neutral grip. Lower the dumbbells to your chest, then press them back up to the starting position.",
+                "name": "Dumbbell Bench Press",
+                "reps": "12-15",
+                "sets": 4,
+                "type": "Strength Training"
+              },
+              {
+                "duration": null,
+                "equipment": [
+                  "Dumbbells"
+                ],
+                "instructions": "Stand with your feet shoulder-width apart, holding a dumbbell in each hand. Bend at the hips, keeping your back straight. Let the dumbbells hang towards the floor. Pull the dumbbells up to your chest, keeping your elbows close to your body.",
+                "name": "Dumbbell Rows",
+                "reps": "12-15",
+                "sets": 4,
+                "type": "Strength Training"
+              },
+              {
+                "duration": null,
+                "equipment": [
+                  "Dumbbells"
+                ],
+                "instructions": "Stand with your feet shoulder-width apart, holding a dumbbell in each hand at shoulder height. Press the dumbbells up overhead, then lower them back down to the starting position.",
+                "name": "Overhead Press",
+                "reps": "12-15",
+                "sets": 4,
+                "type": "Strength Training"
+              },
+              {
+                "duration": null,
+                "equipment": [
+                  "Dumbbells"
+                ],
+                "instructions": "Stand with your feet shoulder-width apart, holding a dumbbell in each hand. Raise your arms out to the sides, keeping your elbows slightly bent. Lower the dumbbells back down to the starting position.",
+                "name": "Lateral Raises",
+                "reps": "15-20",
+                "sets": 4,
+                "type": "Strength Training"
+              },
+              {
+                "duration": null,
+                "equipment": [
+                  "Dumbbells"
+                ],
+                "instructions": "Stand with your feet shoulder-width apart, holding a dumbbell in each hand. Curl the dumbbells up towards your shoulders, keeping your elbows close to your body. Lower the dumbbells back down to the starting position.",
+                "name": "Bicep Curls",
+                "reps": "15-20",
+                "sets": 4,
+                "type": "Strength Training"
+              },
+              {
+                "duration": null,
+                "equipment": [
+                  "Dumbbells"
+                ],
+                "instructions": "Hold a dumbbell in each hand and extend your arms straight above your head, palms facing each other. Lower the dumbbells behind your head by bending your elbows. Extend your arms back to the starting position.",
+                "name": "Triceps Extensions",
+                "reps": "15-20",
+                "sets": 4,
+                "type": "Strength Training"
+              }
+            ],
+            "focus": "Strength Training - Upper Body"
+          },
+          {
+            "day_number": 2,
+            "exercises": [
+              {
+                "duration": "30 seconds",
+                "equipment": [
+                  "Treadmill"
+                ],
+                "instructions": "Warm up for 5 minutes. Sprint at a challenging pace for 30 seconds, followed by 30 seconds of rest or light jogging. Repeat for a total of 10 rounds.",
+                "name": "Treadmill Sprints",
+                "reps": "30 seconds",
+                "sets": 10,
+                "type": "HIIT"
+              },
+              {
+                "duration": null,
+                "equipment": [],
+                "instructions": "Stand with your feet together and arms at your sides. Jump your feet apart while raising your arms overhead. Jump back to the starting position. Repeat.",
+                "name": "Jumping Jacks",
+                "reps": "20",
+                "sets": 5,
+                "type": "HIIT"
+              },
+              {
+                "duration": null,
+                "equipment": [],
+                "instructions": "Run in place, bringing your knees up towards your chest with each step.",
+                "name": "High Knees",
+                "reps": "30 seconds",
+                "sets": 5,
+                "type": "HIIT"
+              },
+              {
+                "duration": null,
+                "equipment": [],
+                "instructions": "Start standing. Squat down and place your hands on the floor. Kick your feet back into a plank position. Do a push-up. Jump your feet back to your hands. Stand up and jump. Repeat.",
+                "name": "Burpees",
+                "reps": "15",
+                "sets": 5,
+                "type": "HIIT"
+              }
+            ],
+            "focus": "HIIT Cardio"
+          },
+          {
+            "day_number": 3,
+            "exercises": [],
+            "focus": "Rest"
+          },
+          {
+            "day_number": 4,
+            "exercises": [
+              {
+                "duration": null,
+                "equipment": [],
+                "instructions": "Stand with your feet shoulder-width apart. Lower your body down by pushing your hips back and bending your knees. Keep your back straight and chest up. Return to the starting position.",
+                "name": "Squats",
+                "reps": "15-20",
+                "sets": 4,
+                "type": "Strength Training"
+              },
+              {
+                "duration": null,
+                "equipment": [],
+                "instructions": "Stand with your feet hip-width apart. Take a step forward with your right foot and lower your body until your right thigh is parallel to the floor. Push off with your right foot to return to the starting position. Repeat on the other side.",
+                "name": "Lunges",
+                "reps": "15-20",
+                "sets": 4,
+                "type": "Strength Training"
+              },
+              {
+                "duration": null,
+                "equipment": [],
+                "instructions": "Lie on your back with your knees bent and feet flat on the floor. Lift your hips off the floor until your body forms a straight line from your shoulders to your knees. Lower your hips back down to the starting position.",
+                "name": "Glute Bridges",
+                "reps": "20-25",
+                "sets": 4,
+                "type": "Strength Training"
+              },
+              {
+                "duration": null,
+                "equipment": [],
+                "instructions": "Stand with your feet hip-width apart. Raise up onto the balls of your feet. Lower your heels back down to the starting position.",
+                "name": "Calf Raises",
+                "reps": "25-30",
+                "sets": 4,
+                "type": "Strength Training"
+              }
+            ],
+            "focus": "Strength Training - Lower Body"
+          },
+          {
+            "day_number": 5,
+            "exercises": [
+              {
+                "duration": "40 minutes",
+                "equipment": [
+                  "Treadmill"
+                ],
+                "instructions": "Jog at a light, conversational pace for 40 minutes.",
+                "name": "Light Jogging",
+                "reps": null,
+                "sets": 1,
+                "type": "Cardio"
+              },
+              {
+                "duration": "15 minutes",
+                "equipment": [
+                  "Yoga Mat"
+                ],
+                "instructions": "Perform a series of stretches, holding each stretch for 30 seconds. Focus on your hamstrings, quads, glutes, and chest.",
+                "name": "Stretching",
+                "reps": null,
+                "sets": 1,
+                "type": "Cardio"
+              }
+            ],
+            "focus": "Active Recovery"
+          }
+        ],
+        "rest_days": [
+          3
+        ],
+        "week_number": 3
+      }
+    ]
+  },
+  "start_date": "2025-03-21T02:18:20.025033",
+  "updated_at": "2025-03-21T02:18:20.028244",
+  "user_profile_id": 2
+}

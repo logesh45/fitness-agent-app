@@ -8,8 +8,11 @@ def create_app():
     app = Flask(__name__)
     CORS(app)
 
-    # Configure SQLAlchemy
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///fitness.db')
+    # Configure SQLAlchemy - use app.root_path to ensure correct path
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{app.root_path}/instance/fitness.db"
+    # No need to use environment variable 
+
+    print(f"SQLALCHEMY_DATABASE_URI: {app.config['SQLALCHEMY_DATABASE_URI']}")
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     # Initialize extensions

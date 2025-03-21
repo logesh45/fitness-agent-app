@@ -2,6 +2,10 @@ import os
 from google import genai
 from google.genai.types import Tool, GenerateContentConfig, GoogleSearch
 from dotenv import load_dotenv
+from langchain_google_vertexai import VertexAI
+from langchain_core.output_parsers import JsonOutputParser
+from langchain_core.prompts import PromptTemplate
+from ..models.workout_exercise import Exercise, DailyWorkout, WeeklyWorkout, WorkoutPlanData
 
 load_dotenv()  # Load environment variables from .env file
 
@@ -12,7 +16,7 @@ print(f"Loaded PROJECT_ID: {PROJECT_ID}")  # Debugging line to check the project
 if PROJECT_ID == "your-default-project-id":
     print("Warning: Using default project ID. Please set the GOOGLE_CLOUD_PROJECT environment variable.")
 
-LOCATION = "us-central1"  # Set your default location
+LOCATION = os.environ.get("GOOGLE_CLOUD_LOCATION", "us-central1")  # Set your default location
 
 model_id = "gemini-2.0-flash-001"
 
@@ -69,19 +73,69 @@ def search_workout_exercises(profile):
     
     return exercises
 
-# if __name__ == '__main__':
-#     # Create a mock user profile for testing
-#     mock_profile = UserProfile(
-#         name='Test User',
-#         age=25,
-#         fitness_goal='Reduce Fat',
-#         equipment=['Dumbbells', 'Bench', 'Running Shoes'],
-#         workout_types=['Strength Training'],
-#         experience_level='beginner'
-#     )
+def generate_structured_workout_plan(profile):
+    """
+    Generate a structured workout plan using LangChain and Pydantic models
     
-#     # Call the search function
-#     exercises = search_workout_exercises(mock_profile)
-#     print('Recommended Exercises:')
-#     for exercise in exercises:
-#         print(exercise)
+    Args:
+        profile: UserProfile object containing user preferences and details
+    """
+    # Connect to Google Cloud resources
+    llm = VertexAI(model_name="gemini-1.5-pro", location=LOCATION)
+    
+    # Create parser for structured output
+    parser = JsonOutputParser(pydantic_object=WorkoutPlanData)
+    
+    # Create prompt template
+    instruction = f"""
+    Create a comprehensive 3-week workout plan for a {profile.experience_level} level person with the following details:
+    - Age: {profile.age}
+    - Fitness Goal: {profile.fitness_goal}
+    - Available Equipment: {', '.join(profile.equipment)}
+    - Preferred Workout Types: {', '.join(profile.workout_types)}
+    
+    The plan should include:
+    1. 3 weeks of workouts
+    2. 5 workout days per week
+    3. Each day should have a specific focus
+    4. Each day should include appropriate exercises with sets, reps, and instructions
+    5. Rest days should be appropriately placed
+    6. Exercises should be appropriate for their experience level and available equipment
+    
+    Make sure all exercises are safe, effective, and aligned with their fitness goals.
+    """
+    
+    prompt = PromptTemplate(
+        template="Generate a structured workout plan\n{format_instructions}\n{instruction}\n",
+        input_variables=["instruction"],
+        partial_variables={"format_instructions": parser.get_format_instructions()},
+    )
+    
+    # Create and execute the chain
+    chain = prompt | llm | parser
+    response = chain.invoke({"instruction": instruction})
+    
+    print(f"Generated workout plan: {response}")
+    return response
+
+if __name__ == '__main__':
+    # Create a mock user profile for testing
+    mock_profile = UserProfile(
+        name='Test User',
+        age=25,
+        fitness_goal='Reduce Fat',
+        equipment=['Dumbbells', 'Bench', 'Running Shoes'],
+        workout_types=['Strength Training'],
+        experience_level='beginner'
+    )
+    
+    # Call the search function
+    exercises = search_workout_exercises(mock_profile)
+    print('Recommended Exercises:')
+    for exercise in exercises:
+        print("Exercise: ", exercise)
+        
+    # Generate structured workout plan
+    plan = generate_structured_workout_plan(mock_profile)
+    print('Structured Workout Plan:')
+    print(plan)

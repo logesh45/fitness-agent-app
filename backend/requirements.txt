@@ -1,7 +1,10 @@
 flask==3.1.0
-flask-cors==3.0.10
+flask-cors==5.0.1
 flask-sqlalchemy==3.1.1
 psycopg2-binary==2.9.10
-python-dotenv==1.0.0
-google-cloud-aiplatform==1.83.0
-google-genai==1.5.0
+python-dotenv==1.0.1
+google-cloud-aiplatform==1.85.0
+google-genai==1.7.0
+langchain-google-vertexai>=0.1.1
+langchain-core>=0.1.27,<0.2
+pydantic>=2.0.0
