@@ -1,14 +1,22 @@
 from flask import Blueprint, request, jsonify
+from pydantic import ValidationError
 from ..agents.fitness_profile_agent import FitnessProfileAgent
 from ..agents.workout_generator_agent import WorkoutGeneratorAgent
+from ..agents.fitness_options_agent import FitnessOptionsAgent
+from ..utils.fitness_options import get_fitness_options
 
 api = Blueprint('api', __name__)
+
+# Initialize agents
+fitness_options_agent = FitnessOptionsAgent()
+fitness_profile_agent = FitnessProfileAgent()
+workout_generator = WorkoutGeneratorAgent()
 
 @api.route('/profiles', methods=['POST'])
 def create_profile():
     try:
         profile_data = request.get_json()
-        profile = FitnessProfileAgent.create_profile(profile_data)
+        profile = fitness_profile_agent.create_profile(profile_data)
         return jsonify(profile), 201
     except Exception as e:
         return jsonify({'error': str(e)}), 400
@@ -16,7 +24,7 @@ def create_profile():
 @api.route('/profiles/<int:profile_id>', methods=['GET'])
 def get_profile(profile_id):
     try:
-        profile = FitnessProfileAgent.get_profile(profile_id)
+        profile = fitness_profile_agent.get_profile(profile_id)
         if not profile:
             return jsonify({'error': 'Profile not found'}), 404
         return jsonify(profile)
@@ -27,7 +35,7 @@ def get_profile(profile_id):
 def update_profile(profile_id):
     try:
         profile_data = request.get_json()
-        profile = FitnessProfileAgent.update_profile(profile_id, profile_data)
+        profile = fitness_profile_agent.update_profile(profile_id, profile_data)
         if not profile:
             return jsonify({'error': 'Profile not found'}), 404
         return jsonify(profile)
@@ -37,7 +45,7 @@ def update_profile(profile_id):
 @api.route('/profiles/<int:profile_id>/workout-plan', methods=['POST'])
 def generate_workout_plan(profile_id):
     try:
-        workout_plan = WorkoutGeneratorAgent.generate_workout_plan(profile_id)
+        workout_plan = workout_generator.generate_workout_plan(profile_id)
         return jsonify(workout_plan), 201
     except ValueError as e:
         return jsonify({'error': str(e)}), 404
@@ -54,3 +62,33 @@ def get_latest_workout_plan(profile_id):
         return jsonify(plan.to_dict())
     except Exception as e:
         return jsonify({'error': str(e)}), 400
+
+@api.route('/fitness-options', methods=['GET'])
+def get_fitness_selection_options():
+    """
+    Returns personalized fitness options based on user's age.
+    If no age is provided, returns default options.
+    """
+    try:
+        # Get user's age from query parameters
+        user_age = request.args.get('age', type=int)
+        
+        if not user_age:
+            return jsonify({'error': 'Age parameter is required'}), 400
+            
+        # Generate personalized options using LLM
+        options = fitness_options_agent.generate_personalized_options(user_age)
+        return jsonify(options)
+        
+    except ValidationError as e:
+        # Handle Pydantic validation errors
+        return jsonify({
+            'error': 'Invalid response format from AI model',
+            'details': str(e)
+        }), 500
+    except Exception as e:
+        # Handle other errors
+        return jsonify({
+            'error': 'Failed to generate fitness options',
+            'details': str(e)
+        }), 500

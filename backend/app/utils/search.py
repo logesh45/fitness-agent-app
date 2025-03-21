@@ -81,7 +81,7 @@ def generate_structured_workout_plan(profile):
         profile: UserProfile object containing user preferences and details
     """
     # Connect to Google Cloud resources
-    llm = VertexAI(model_name="gemini-1.5-pro", location=LOCATION)
+    llm = VertexAI(model_name="gemini-2.0-flash-001", location=LOCATION)
     
     # Create parser for structured output
     parser = JsonOutputParser(pydantic_object=WorkoutPlanData)
@@ -118,24 +118,24 @@ def generate_structured_workout_plan(profile):
     print(f"Generated workout plan: {response}")
     return response
 
-if __name__ == '__main__':
-    # Create a mock user profile for testing
-    mock_profile = UserProfile(
-        name='Test User',
-        age=25,
-        fitness_goal='Reduce Fat',
-        equipment=['Dumbbells', 'Bench', 'Running Shoes'],
-        workout_types=['Strength Training'],
-        experience_level='beginner'
-    )
+# if __name__ == '__main__':
+#     # Create a mock user profile for testing
+#     mock_profile = UserProfile(
+#         name='Test User',
+#         age=25,
+#         fitness_goal='Reduce Fat',
+#         equipment=['Dumbbells', 'Bench', 'Running Shoes'],
+#         workout_types=['Strength Training'],
+#         experience_level='beginner'
+#     )
     
-    # Call the search function
-    exercises = search_workout_exercises(mock_profile)
-    print('Recommended Exercises:')
-    for exercise in exercises:
-        print("Exercise: ", exercise)
+#     # Call the search function
+#     exercises = search_workout_exercises(mock_profile)
+#     print('Recommended Exercises:')
+#     for exercise in exercises:
+#         print("Exercise: ", exercise)
         
-    # Generate structured workout plan
-    plan = generate_structured_workout_plan(mock_profile)
-    print('Structured Workout Plan:')
-    print(plan)
+#     # Generate structured workout plan
+#     plan = generate_structured_workout_plan(mock_profile)
+#     print('Structured Workout Plan:')
+#     print(plan)
