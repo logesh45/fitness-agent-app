@@ -5,7 +5,7 @@ class WorkoutPlan(db.Model):
     __tablename__ = 'workout_plans'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_profile_id = db.Column(db.Integer, db.ForeignKey('user_profiles.id'), nullable=False)
+    user_profile_id = db.Column(db.String(36), db.ForeignKey('user_profiles.uuid'), nullable=False)
     start_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     end_date = db.Column(db.DateTime, nullable=False)
     plan_data = db.Column(db.JSON, nullable=False)  # Store the complete 3-week plan

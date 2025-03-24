@@ -21,52 +21,102 @@ def create_profile():
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
-@api.route('/profiles/<int:profile_id>', methods=['GET'])
+@api.route('/profiles/<uuid:profile_id>', methods=['GET'])
 def get_profile(profile_id):
     try:
-        profile = fitness_profile_agent.get_profile(profile_id)
+        profile = fitness_profile_agent.get_profile(str(profile_id))
         if not profile:
             return jsonify({'error': 'Profile not found'}), 404
         return jsonify(profile)
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
-@api.route('/profiles/<int:profile_id>', methods=['PUT'])
+@api.route('/profiles/<uuid:profile_id>', methods=['PUT'])
 def update_profile(profile_id):
     try:
         profile_data = request.get_json()
-        profile = fitness_profile_agent.update_profile(profile_id, profile_data)
+        profile = fitness_profile_agent.update_profile(str(profile_id), profile_data)
         if not profile:
             return jsonify({'error': 'Profile not found'}), 404
         return jsonify(profile)
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
-@api.route('/profiles/<int:profile_id>/workout-plan', methods=['POST'])
+@api.route('/profiles/<uuid:profile_id>/workout-plan', methods=['POST'])
 def generate_workout_plan(profile_id):
     try:
-        workout_plan = workout_generator.generate_workout_plan(profile_id)
+        workout_plan = workout_generator.generate_workout_plan(str(profile_id))
         return jsonify(workout_plan), 201
     except ValueError as e:
         return jsonify({'error': str(e)}), 404
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
-@api.route('/profiles/<int:profile_id>/workout-plan', methods=['GET'])
+@api.route('/profiles/<uuid:profile_id>/workout-plan', methods=['GET'])
 def get_latest_workout_plan(profile_id):
     try:
         from ..models.workout_plan import WorkoutPlan
-        plan = WorkoutPlan.query.filter_by(user_profile_id=profile_id).order_by(WorkoutPlan.created_at.desc()).first()
+        plan = WorkoutPlan.query.filter_by(user_profile_id=str(profile_id)).order_by(WorkoutPlan.created_at.desc()).first()
         if not plan:
             return jsonify({'error': 'No workout plan found'}), 404
         return jsonify(plan.to_dict())
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
+@api.route('/profile', methods=['POST'])
+def create_user_profile():
+    """
+    Create a new user profile and return a session token.
+    """
+    try:
+        profile_data = request.get_json()
+        
+        # Validate required fields
+        required_fields = ['name', 'age', 'fitness_goal', 'equipment', 'workout_types', 'experience_level']
+        if not all(field in profile_data for field in required_fields):
+            return jsonify({'error': 'Missing required fields'}), 400
+            
+        # Create profile and get UUID
+        profile = fitness_profile_agent.create_profile(profile_data)
+        
+        return jsonify({
+            'session_token': profile['uuid'],
+            'profile': profile
+        }), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@api.route('/profile/<uuid:session_token>', methods=['GET'])
+def get_user_profile(session_token: str):
+    """
+    Retrieve user profile using session token.
+    """
+    try:
+        profile = fitness_profile_agent.get_profile(session_token)
+        if not profile:
+            return jsonify({'error': 'Profile not found'}), 404
+        return jsonify(profile)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@api.route('/profile/<uuid:session_token>', methods=['PUT'])
+def update_user_profile(session_token: str):
+    """
+    Update user profile using session token.
+    """
+    try:
+        profile_data = request.get_json()
+        profile = fitness_profile_agent.update_profile(session_token, profile_data)
+        if not profile:
+            return jsonify({'error': 'Profile not found'}), 404
+        return jsonify(profile)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @api.route('/fitness-options', methods=['GET'])
 def get_fitness_selection_options():
     """
-    Returns personalized fitness options based on user's age and previous selections.
+    Returns personalized fitness options based on user's age.
     If no age is provided, returns default options.
     """
     try:
@@ -76,11 +126,8 @@ def get_fitness_selection_options():
         if not user_age:
             return jsonify({'error': 'Age parameter is required'}), 400
             
-        # Get user's previous selections from query parameters
-        user_selections = request.args.getlist('selections')
-        
         # Generate personalized options using LLM
-        options = fitness_options_agent.generate_personalized_options(user_age, user_selections)
+        options = fitness_options_agent.generate_personalized_options(user_age)
         return jsonify(options)
         
     except ValidationError as e:

@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+import uuid
 
 db = SQLAlchemy()
 
@@ -7,6 +8,7 @@ class UserProfile(db.Model):
     __tablename__ = 'user_profiles'
 
     id = db.Column(db.Integer, primary_key=True)
+    uuid = db.Column(db.String(36), unique=True, nullable=False)
     name = db.Column(db.String(100), nullable=False)
     age = db.Column(db.Integer, nullable=False)
     fitness_goal = db.Column(db.String(50), nullable=False)
@@ -16,9 +18,19 @@ class UserProfile(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    def __init__(self, name, age, fitness_goal, equipment, workout_types, experience_level):
+        self.uuid = str(uuid.uuid4())
+        self.name = name
+        self.age = age
+        self.fitness_goal = fitness_goal
+        self.equipment = equipment
+        self.workout_types = workout_types
+        self.experience_level = experience_level
+
     def to_dict(self):
         return {
             'id': self.id,
+            'uuid': self.uuid,
             'name': self.name,
             'age': self.age,
             'fitness_goal': self.fitness_goal,

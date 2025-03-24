@@ -16,7 +16,7 @@ class FitnessProfileAgent:
     @staticmethod
     def get_profile(profile_id):
         """Retrieve a user's fitness profile."""
-        profile = UserProfile.query.get(profile_id)
+        profile = UserProfile.query.filter_by(uuid=profile_id).first()
         return profile.to_dict() if profile else None
 
     @staticmethod
