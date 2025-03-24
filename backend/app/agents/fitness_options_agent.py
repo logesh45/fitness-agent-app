@@ -28,7 +28,7 @@ class FitnessOptionsAgent:
         # Create prompt template
         self.prompt_template = PromptTemplate(
             template="""
-            Generate personalized fitness options for a {user_age} year old person.
+            Generate personalized fitness options for a {user_age} year old person with previous selections: {user_selections}.
             
             Consider factors like:
             1. Physical capabilities and limitations for this age
@@ -46,53 +46,52 @@ class FitnessOptionsAgent:
             4. Experience Levels (with progression timelines)
             
             Each option should include:
-            - A unique ID (lowercase with underscores)
+            - A unique ID
             - A clear name
             - A detailed description
-            - An appropriate icon name
-            - Category-specific fields (age notes, safety tips, etc.)
+            - An icon name
+            - A relevance score (1-10)
             
-            Use appropriate icons from: activity, heart-pulse, dumbbell, running, yoga, swimming, cycling, walking, stretching, meditation
+            Use icons from: activity, heart-pulse, dumbbell, running, yoga, swimming, cycling, walking, stretching, meditation
+            
             
             Focus on safety, sustainability, and age-appropriate progression.
-            
             {format_instructions}
             """,
-            input_variables=["user_age"],
+            input_variables=["user_age", "user_selections"],
             partial_variables={"format_instructions": self.parser.get_format_instructions()}
+
         )
 
-    def generate_personalized_options(self, user_age: int) -> Dict[str, List[Dict]]:
+        # Create the chain
+        self.chain = self.prompt_template | self.llm | self.parser
+
+    def generate_personalized_options(self, user_age: int, user_selections: List[str] = None) -> Dict:
         """
-        Generate personalized fitness options based on user's age.
+        Generate personalized fitness options based on user's age and previous selections.
         
         Args:
-            user_age: The age of the user in years
+            user_age: The age of the user
+            user_selections: List of previous user selections
             
         Returns:
-            A dictionary containing personalized options for:
-            - fitness_goals
-            - equipment_options
-            - workout_types
-            - experience_levels
+            Dict: Structured fitness options
         """
+        # Format previous selections for the prompt
+        formatted_selections = "None" if not user_selections else ", ".join(user_selections)
+        
+        # Generate options using the chain
         try:
-            # Create and execute the chain
-            chain = self.prompt_template | self.llm | self.parser
-            response = chain.invoke({"user_age": user_age})
-
+            response = self.chain.invoke({"user_age": user_age, "user_selections": formatted_selections})
             print(f"Generated options: {response}")
-            
-            # The response from parser should be a Pydantic model, convert it to dict
+            # The response from parser should be a Pydantic model, convert to dict
             if isinstance(response, dict):
-                # If it's already a dict, return it
                 return response
             elif isinstance(response, FitnessOptions):
-                # If it's a Pydantic model, convert to dict
                 return response.dict()
             else:
                 raise ValueError(f"Unexpected response type: {type(response)}")
-            
+                
         except ValidationError as e:
             print(f"Validation error in fitness options: {str(e)}")
             raise

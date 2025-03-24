@@ -66,7 +66,7 @@ def get_latest_workout_plan(profile_id):
 @api.route('/fitness-options', methods=['GET'])
 def get_fitness_selection_options():
     """
-    Returns personalized fitness options based on user's age.
+    Returns personalized fitness options based on user's age and previous selections.
     If no age is provided, returns default options.
     """
     try:
@@ -76,8 +76,11 @@ def get_fitness_selection_options():
         if not user_age:
             return jsonify({'error': 'Age parameter is required'}), 400
             
+        # Get user's previous selections from query parameters
+        user_selections = request.args.getlist('selections')
+        
         # Generate personalized options using LLM
-        options = fitness_options_agent.generate_personalized_options(user_age)
+        options = fitness_options_agent.generate_personalized_options(user_age, user_selections)
         return jsonify(options)
         
     except ValidationError as e:

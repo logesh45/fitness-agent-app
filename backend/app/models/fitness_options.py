@@ -9,6 +9,10 @@ class FitnessOption(BaseModel):
     name: str = Field(..., description="Display name")
     description: str = Field(..., description="Detailed description")
     icon: str = Field(..., description="Icon name for UI display")
+    relevance_score: int = Field(
+        default=5,
+        description="Relevance score based on user's previous selections (1-10)"
+    )
 
 class FitnessGoal(FitnessOption):
     age_specific_notes: str = Field(..., description="Why this goal is relevant for this age")
