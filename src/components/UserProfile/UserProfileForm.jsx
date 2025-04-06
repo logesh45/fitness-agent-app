@@ -1,18 +1,4 @@
 import { useState } from 'react';
-import { 
-  Box, 
-  TextField, 
-  Button, 
-  FormControl, 
-  InputLabel, 
-  Select, 
-  MenuItem, 
-  Checkbox,
-  Typography,
-  Paper,
-  Snackbar,
-  Alert
-} from '@mui/material';
 import axios from 'axios';
 import WorkoutPlan from '../WorkoutPlan/WorkoutPlan';
 
@@ -42,195 +28,198 @@ const WORKOUT_TYPES = [
   'Cardio'
 ];
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'http://localhost:5002/api';
 
-export default function UserProfileForm() {
-  const [formData, setFormData] = useState({
+const UserProfileForm = () => {
+  const [profile, setProfile] = useState({
     name: '',
     age: '',
-    fitnessGoal: '',
+    fitness_goal: '',
     equipment: [],
-    workoutTypes: [],
-    experienceLevel: 'beginner'
+    workout_types: [],
+    experience_level: ''
   });
-
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: '',
-    severity: 'success'
-  });
-
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
   const [profileId, setProfileId] = useState(null);
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setFormData(prev => ({
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setProfile(prev => ({
       ...prev,
       [name]: value
     }));
   };
 
-  const handleEquipmentChange = (event) => {
-    const { value } = event.target;
-    setFormData(prev => ({
+  const handleArrayChange = (field, value) => {
+    setProfile(prev => ({
       ...prev,
-      equipment: typeof value === 'string' ? value.split(',') : value,
+      [field]: value
     }));
   };
 
-  const handleWorkoutTypesChange = (event) => {
-    const { value } = event.target;
-    setFormData(prev => ({
-      ...prev,
-      workoutTypes: typeof value === 'string' ? value.split(',') : value,
-    }));
-  };
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
-      const response = await axios.post(`${API_BASE_URL}/profiles`, formData);
+      const response = await axios.post(`${API_BASE_URL}/profile`, profile);
       setProfileId(response.data.id);
-      setSnackbar({
-        open: true,
-        message: 'Profile created successfully!',
-        severity: 'success'
-      });
-      console.log('Profile created:', response.data);
+      setSuccess(true);
+      setError('');
+      setProfile(response.data.profile);
     } catch (error) {
-      setSnackbar({
-        open: true,
-        message: error.response?.data?.error || 'Error creating profile',
-        severity: 'error'
-      });
-      console.error('Error creating profile:', error);
+      setError(error.response?.data?.error || 'An error occurred');
+      setSuccess(false);
     }
   };
 
-  const handleCloseSnackbar = () => {
-    setSnackbar(prev => ({ ...prev, open: false }));
-  };
-
   return (
-    <Box>
-      <Paper elevation={3} sx={{ p: 4, maxWidth: 600, mx: 'auto', mt: 4 }}>
-        <Typography variant="h4" gutterBottom>
-          Create Your Fitness Profile
-        </Typography>
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
-          <TextField
-            fullWidth
-            label="Name"
+    <div className="max-w-2xl mx-auto p-6">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div>
+          <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
+          <input
+            type="text"
+            id="name"
             name="name"
-            value={formData.name}
-            onChange={handleChange}
-            margin="normal"
+            value={profile.name}
+            onChange={handleInputChange}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
             required
           />
-          
-          <TextField
-            fullWidth
-            label="Age"
-            name="age"
+        </div>
+
+        <div>
+          <label htmlFor="age" className="block text-sm font-medium text-gray-700">Age</label>
+          <input
             type="number"
-            value={formData.age}
-            onChange={handleChange}
-            margin="normal"
+            id="age"
+            name="age"
+            value={profile.age}
+            onChange={handleInputChange}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
             required
+            min="18"
+            max="99"
           />
+        </div>
 
-          <FormControl fullWidth margin="normal" required>
-            <InputLabel>Fitness Goal</InputLabel>
-            <Select
-              name="fitnessGoal"
-              value={formData.fitnessGoal}
-              onChange={handleChange}
-              label="Fitness Goal"
-            >
-              {FITNESS_GOALS.map((goal) => (
-                <MenuItem key={goal} value={goal}>
-                  {goal}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          <FormControl fullWidth margin="normal" required>
-            <InputLabel>Available Equipment</InputLabel>
-            <Select
-              multiple
-              name="equipment"
-              value={formData.equipment}
-              onChange={handleEquipmentChange}
-              label="Available Equipment"
-              renderValue={(selected) => selected.join(', ')}
-            >
-              {EQUIPMENT_OPTIONS.map((item) => (
-                <MenuItem key={item} value={item}>
-                  <Checkbox checked={formData.equipment.indexOf(item) > -1} />
-                  {item}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          <FormControl fullWidth margin="normal" required>
-            <InputLabel>Workout Types</InputLabel>
-            <Select
-              multiple
-              name="workoutTypes"
-              value={formData.workoutTypes}
-              onChange={handleWorkoutTypesChange}
-              label="Workout Types"
-              renderValue={(selected) => selected.join(', ')}
-            >
-              {WORKOUT_TYPES.map((type) => (
-                <MenuItem key={type} value={type}>
-                  <Checkbox checked={formData.workoutTypes.indexOf(type) > -1} />
-                  {type}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          <FormControl fullWidth margin="normal" required>
-            <InputLabel>Experience Level</InputLabel>
-            <Select
-              name="experienceLevel"
-              value={formData.experienceLevel}
-              onChange={handleChange}
-              label="Experience Level"
-            >
-              <MenuItem value="beginner">Beginner</MenuItem>
-              <MenuItem value="intermediate">Intermediate</MenuItem>
-              <MenuItem value="advanced">Advanced</MenuItem>
-            </Select>
-          </FormControl>
-
-          <Button 
-            type="submit" 
-            variant="contained" 
-            color="primary" 
-            fullWidth 
-            sx={{ mt: 3 }}
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Fitness Goals</label>
+          <select
+            id="fitness_goal"
+            name="fitness_goal"
+            value={profile.fitness_goal}
+            onChange={handleInputChange}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+            required
           >
-            Create Profile
-          </Button>
-        </Box>
+            <option value="">Select a goal</option>
+            {FITNESS_GOALS.map((goal) => (
+              <option key={goal} value={goal.toLowerCase().replace(' ', '_')}>
+                {goal}
+              </option>
+            ))}
+          </select>
+        </div>
 
-        <Snackbar
-          open={snackbar.open}
-          autoHideDuration={6000}
-          onClose={handleCloseSnackbar}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Available Equipment</label>
+          <div className="mt-2 space-y-2">
+            {EQUIPMENT_OPTIONS.map((item) => (
+              <div key={item} className="flex items-center">
+                <input
+                  id={item}
+                  name="equipment"
+                  type="checkbox"
+                  value={item.toLowerCase().replace(' ', '_')}
+                  checked={profile.equipment.includes(item.toLowerCase().replace(' ', '_'))}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    handleArrayChange('equipment', 
+                      profile.equipment.includes(value)
+                        ? profile.equipment.filter(e => e !== value)
+                        : [...profile.equipment, value]
+                    );
+                  }}
+                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500"
+                />
+                <label htmlFor={item} className="ml-3 block text-sm font-medium text-gray-700">
+                  {item}
+                </label>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Workout Types</label>
+          <div className="mt-2 space-y-2">
+            {WORKOUT_TYPES.map((item) => (
+              <div key={item} className="flex items-center">
+                <input
+                  id={item}
+                  name="workout_types"
+                  type="checkbox"
+                  value={item.toLowerCase().replace(' ', '_')}
+                  checked={profile.workout_types.includes(item.toLowerCase().replace(' ', '_'))}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    handleArrayChange('workout_types', 
+                      profile.workout_types.includes(value)
+                        ? profile.workout_types.filter(e => e !== value)
+                        : [...profile.workout_types, value]
+                    );
+                  }}
+                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500"
+                />
+                <label htmlFor={item} className="ml-3 block text-sm font-medium text-gray-700">
+                  {item}
+                </label>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <label htmlFor="experience_level" className="block text-sm font-medium text-gray-700">Experience Level</label>
+          <select
+            id="experience_level"
+            name="experience_level"
+            value={profile.experience_level}
+            onChange={handleInputChange}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+            required
+          >
+            <option value="">Select your level</option>
+            <option value="beginner">Beginner</option>
+            <option value="intermediate">Intermediate</option>
+            <option value="advanced">Advanced</option>
+          </select>
+        </div>
+
+        <button
+          type="submit"
+          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
         >
-          <Alert onClose={handleCloseSnackbar} severity={snackbar.severity}>
-            {snackbar.message}
-          </Alert>
-        </Snackbar>
-      </Paper>
+          Create Profile
+        </button>
+      </form>
+
+      {error && (
+        <div className="mt-4 p-4 bg-red-50 text-red-700 rounded-md">
+          {error}
+        </div>
+      )}
+
+      {success && (
+        <div className="mt-4 p-4 bg-green-50 text-green-700 rounded-md">
+          Profile created successfully!
+        </div>
+      )}
 
       {profileId && <WorkoutPlan profileId={profileId} />}
-    </Box>
+    </div>
   );
-}
+};
+
+export default UserProfileForm;

@@ -4,6 +4,7 @@ from ..agents.fitness_profile_agent import FitnessProfileAgent
 from ..agents.workout_generator_agent import WorkoutGeneratorAgent
 from ..agents.fitness_options_agent import FitnessOptionsAgent
 from ..utils.fitness_options import get_fitness_options
+import json
 
 api = Blueprint('api', __name__)
 
@@ -116,7 +117,7 @@ def update_user_profile(session_token: str):
 @api.route('/fitness-options', methods=['GET'])
 def get_fitness_selection_options():
     """
-    Returns personalized fitness options based on user's age.
+    Returns personalized fitness options based on user's age and previous selections.
     If no age is provided, returns default options.
     """
     try:
@@ -126,10 +127,19 @@ def get_fitness_selection_options():
         if not user_age:
             return jsonify({'error': 'Age parameter is required'}), 400
             
+        # Get user's previous selections from query parameters
+        selections_json = request.args.get('selections')
+        user_selections = json.loads(selections_json) if selections_json else []
+        
         # Generate personalized options using LLM
-        options = fitness_options_agent.generate_personalized_options(user_age)
+        options = fitness_options_agent.generate_personalized_options(user_age, user_selections)
         return jsonify(options)
         
+    except json.JSONDecodeError as e:
+        return jsonify({
+            'error': 'Invalid selections format',
+            'details': str(e)
+        }), 400
     except ValidationError as e:
         # Handle Pydantic validation errors
         return jsonify({
@@ -138,6 +148,7 @@ def get_fitness_selection_options():
         }), 500
     except Exception as e:
         # Handle other errors
+        print(f"Error in get_fitness_selection_options: {str(e)}")  # Add debug logging
         return jsonify({
             'error': 'Failed to generate fitness options',
             'details': str(e)

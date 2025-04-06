@@ -1,40 +1,23 @@
 import { useState, useEffect } from 'react';
-import {
-  Box,
-  Typography,
-  Paper,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Button,
-  CircularProgress,
-  Alert,
-  Card,
-  CardContent,
-  Grid,
-  Chip
-} from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'http://localhost:5002/api';
 
-export default function WorkoutPlan({ profileId }) {
+export default function WorkoutPlan({ profileId, profile }) {
   const [workoutPlan, setWorkoutPlan] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const fetchWorkoutPlan = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/profiles/${profileId}/workout-plan`);
+      setLoading(true);
+      const response = await axios.post(`${API_BASE_URL}/workout-plan`, profile);
       setWorkoutPlan(response.data);
       setError(null);
-    } catch (error) {
-      if (error.response?.status === 404) {
-        setWorkoutPlan(null);
-      } else {
-        setError('Error fetching workout plan');
-      }
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to fetch workout plan');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -57,103 +40,72 @@ export default function WorkoutPlan({ profileId }) {
     }
   }, [profileId]);
 
-  if (loading) {
-    return (
-      <Box display="flex" justifyContent="center" m={4}>
-        <CircularProgress />
-      </Box>
-    );
-  }
+  const renderWorkoutPlan = () => {
+    if (!workoutPlan) return null;
 
-  if (error) {
     return (
-      <Alert severity="error" sx={{ mt: 2 }}>
-        {error}
-      </Alert>
-    );
-  }
+      <div className="space-y-6">
+        <div className="border-b border-gray-200 pb-4">
+          <h2 className="text-2xl font-bold">Your 3-Week Workout Plan</h2>
+        </div>
 
-  if (!workoutPlan) {
-    return (
-      <Box sx={{ mt: 4, textAlign: 'center' }}>
-        <Typography variant="h6" gutterBottom>
-          No workout plan found
-        </Typography>
-        <Button
-          variant="contained"
-          color="primary"
+        <div className="text-gray-600">
+          {new Date(workoutPlan.start_date).toLocaleDateString()} - {new Date(workoutPlan.end_date).toLocaleDateString()}
+        </div>
+
+        {workoutPlan.plan_data.weeks.map((week, index) => (
+          <div key={index} className="border rounded-lg p-4 mb-4">
+            <h3 className="text-xl font-semibold mb-2">Week {week.week_number}</h3>
+            
+            <div className="space-y-4">
+              {week.days.map((day, dayIndex) => (
+                <div key={dayIndex} className="border-l-4 border-indigo-500 pl-4">
+                  <h4 className="font-medium mb-1">Day {day.day_number}</h4>
+                  <div className="space-y-4">
+                    {day.exercises.map((exercise, exIndex) => (
+                      <div key={exIndex} className="border-l-4 border-indigo-500 pl-4">
+                        <h4 className="font-medium mb-1">{exercise.name}</h4>
+                        <div className="mt-2 flex justify-between text-sm text-gray-600">
+                          {exercise.sets && exercise.reps 
+                            ? <span>Sets: {exercise.sets}, Reps: {exercise.reps}</span>
+                            : exercise.duration 
+                              ? <span>Duration: {exercise.duration}</span>
+                              : ''}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+
+        <button
+          className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded"
           onClick={generateWorkoutPlan}
-          sx={{ mt: 2 }}
         >
-          Generate Workout Plan
-        </Button>
-      </Box>
+          Generate New Plan
+        </button>
+      </div>
     );
-  }
+  };
 
   return (
-    <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
-      <Typography variant="h4" gutterBottom>
-        Your 3-Week Workout Plan
-      </Typography>
-      
-      <Typography variant="subtitle1" color="text.secondary" gutterBottom>
-        {new Date(workoutPlan.start_date).toLocaleDateString()} - {new Date(workoutPlan.end_date).toLocaleDateString()}
-      </Typography>
+    <div className="max-w-3xl mx-auto p-6">
+      {loading && (
+        <div className="flex justify-center items-center h-32">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
+        </div>
+      )}
 
-      {workoutPlan.plan_data.weeks.map((week) => (
-        <Accordion key={week.week_number}>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography variant="h6">Week {week.week_number}</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Grid container spacing={2}>
-              {week.days.map((day) => (
-                <Grid item xs={12} key={day.day_number}>
-                  <Card variant="outlined">
-                    <CardContent>
-                      <Typography variant="h6" gutterBottom>
-                        Day {day.day_number}
-                      </Typography>
-                      <Box sx={{ mb: 2 }}>
-                        {day.exercises.map((exercise, index) => (
-                          <Box key={index} sx={{ mb: 2 }}>
-                            <Typography variant="subtitle1" gutterBottom>
-                              <Chip 
-                                label={exercise.type} 
-                                size="small" 
-                                color="primary" 
-                                sx={{ mr: 1 }}
-                              />
-                              {exercise.name}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                              {exercise.sets && exercise.reps 
-                                ? `${exercise.sets} sets of ${exercise.reps} reps`
-                                : exercise.duration 
-                                  ? `Duration: ${exercise.duration}`
-                                  : ''}
-                            </Typography>
-                          </Box>
-                        ))}
-                      </Box>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-          </AccordionDetails>
-        </Accordion>
-      ))}
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+          {error}
+        </div>
+      )}
 
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={generateWorkoutPlan}
-        sx={{ mt: 3 }}
-      >
-        Generate New Plan
-      </Button>
-    </Paper>
+      {workoutPlan && renderWorkoutPlan()}
+    </div>
   );
 }

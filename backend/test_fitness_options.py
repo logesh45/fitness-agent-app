@@ -12,19 +12,46 @@ def test_fitness_options_generation():
     # Test with different age groups and selection scenarios
     test_cases = [
         {
-            "age": 33,
+            "age": 25,
             "selections": None,
             "description": "Initial selection with no previous choices"
         },
         {
-            "age": 33,
-            "selections": ["weight_loss", "beginner"],
-            "description": "Second selection with weight loss and beginner level"
+            "age": 25,
+            "selections": [
+                {
+                    "id": "goal-1",
+                    "name": "Weight Loss",
+                    "type": "goal"
+                },
+                {
+                    "id": "equip-1",
+                    "name": "Dumbbells",
+                    "type": "equipment"
+                }
+            ],
+            "description": "Selection with weight loss goal and dumbbells"
         },
         {
-            "age": 33,
-            "selections": ["weight_loss", "beginner", "cardio"],
-            "description": "Third selection with additional cardio focus"
+            "age": 25,
+            "selections": [
+                {
+                    "id": "goal-1",
+                    "name": "Weight Loss",
+                    "type": "goal"
+                },
+                {
+                    "id": "equip-1",
+                    "name": "Dumbbells",
+                    "type": "equipment"
+                },
+                {
+                    "id": "workout-2",
+                    "name": "Cardio",
+                    "type": "workout"
+                }
+            ],
+            "description": "Selection with weight loss, dumbbells, and cardio"
         }
     ]
 
@@ -39,12 +66,40 @@ def test_fitness_options_generation():
             assert all(key in options for key in ['fitness_goals', 'equipment_options', 'workout_types', 'experience_levels']), \
                 "Response missing required categories"
             
-            # Validate that options include relevance scores
-            for category in options.values():
+            # Validate that options include relevance scores and required fields
+            for category_name, category in options.items():
                 for option in category:
-                    assert 'relevance_score' in option, "Each option should have a relevance score"
+                    # Common fields for all options
+                    assert 'id' in option, f"Option in {category_name} missing id"
+                    assert 'name' in option, f"Option in {category_name} missing name"
+                    assert 'description' in option, f"Option in {category_name} missing description"
+                    assert 'icon' in option, f"Option in {category_name} missing icon"
+                    assert 'relevance_score' in option, f"Option in {category_name} missing relevance score"
                     assert isinstance(option['relevance_score'], int), "Relevance score should be an integer"
                     assert 1 <= option['relevance_score'] <= 10, "Relevance score should be between 1 and 10"
+                    
+                    # Category-specific fields
+                    if category_name == 'fitness_goals':
+                        assert 'age_specific_notes' in option, "Fitness goal missing age_specific_notes"
+                    elif category_name == 'equipment_options':
+                        assert 'safety_considerations' in option, "Equipment option missing safety_considerations"
+                    elif category_name == 'workout_types':
+                        assert 'intensity_recommendation' in option, "Workout type missing intensity_recommendation"
+                    elif category_name == 'experience_levels':
+                        assert 'progression_timeline' in option, "Experience level missing progression_timeline"
+            
+            # If there were selections, verify they are included in the response
+            if case['selections']:
+                for selection in case['selections']:
+                    category_map = {
+                        'goal': 'fitness_goals',
+                        'equipment': 'equipment_options',
+                        'workout': 'workout_types',
+                        'level': 'experience_levels'
+                    }
+                    category_key = category_map[selection['type']]
+                    found = any(opt['id'] == selection['id'] for opt in options[category_key])
+                    assert found, f"Selected option {selection['id']} not found in response"
             
             # Print the formatted response
             print(json.dumps(options, indent=2))
