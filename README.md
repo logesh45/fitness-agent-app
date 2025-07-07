@@ -2,6 +2,12 @@
 
 This is a full-stack web application that generates personalized fitness plans for users based on their age, goals, and experience level. The backend is built with Flask and the frontend is a React application.
 
+## Application Architecture
+
+![Fitness App Architecture](docs/images/fitness-app-architecture.png)
+
+This diagram illustrates the high-level architecture of the fitness application, showing the interaction between the frontend, backend services, AI/LLM components, and the database.
+
 ## Features
 
 - User profile creation and updates
