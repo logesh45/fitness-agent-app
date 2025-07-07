@@ -4,7 +4,7 @@ This is a full-stack web application that generates personalized fitness plans f
 
 ## Application Architecture
 
-![Fitness App Architecture](docs/images/fitness-app-architecture.png)
+<img src="docs/images/fitness-app-architecture.png" alt="Fitness App Architecture" width="700px">
 
 This diagram illustrates the high-level architecture of the fitness application, showing the interaction between the frontend, backend services, AI/LLM components, and the database.
 
