@@ -1,8 +1,77 @@
 # Personalized Fitness App
 
-This is a full-stack web application that generates personalized workout plans for users based on their individual profiles, goals, and preferences.
+This is a full-stack web application that generates personalized fitness plans for users based on their age, goals, and experience level. The backend is built with Flask and the frontend is a React application.
 
-## Key Features
+## Features
+
+- User profile creation and updates
+- Dynamic fitness options based on user's age
+- Personalized workout plan generation
+- Interactive dashboard to view workout plans
+
+## Getting Started
+
+### Prerequisites
+
+- Python 3.x
+- Node.js and npm
+
+### Backend Setup
+
+1.  **Navigate to the backend directory:**
+    ```sh
+    cd backend
+    ```
+
+2.  **Create and activate a virtual environment:**
+    ```sh
+    python3 -m venv venv
+    source venv/bin/activate
+    ```
+
+3.  **Install dependencies:**
+    ```sh
+    pip install -r requirements.txt
+    ```
+
+3.  **Set up environment variables:**
+    Copy the example `.env.example` to `.env` and fill in the required values.
+
+4.  **Run database migrations:**
+    ```sh
+    flask db upgrade
+    ```
+
+5.  **Start the backend server:**
+    ```sh
+    python run.py
+    ```
+
+### Frontend Setup
+
+1.  **Navigate to the project root directory (if you are in the `backend` directory):**
+    ```sh
+    cd ..
+    ```
+
+2.  **Install dependencies:**
+    ```sh
+    npm install
+    ```
+
+3.  **Start the frontend development server:**
+    ```sh
+    npm run dev
+    ```
+
+## Technologies Used
+
+- **Backend:** Flask, Python
+- **Frontend:** React, Tailwind CSS
+- **Database:** SQLite (or as configured)
+
+
+
 
 - **Personalized User Profiles**: Users can create a detailed profile with their fitness goals, available equipment, preferred workout types, and experience level.
 - **Dynamic Workout Generation**: The backend uses a set of intelligent agents to create customized workout plans tailored to each user's profile.
