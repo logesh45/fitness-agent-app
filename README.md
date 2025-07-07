@@ -8,80 +8,24 @@ This is a full-stack web application that generates personalized fitness plans f
 - Dynamic fitness options based on user's age
 - Personalized workout plan generation
 - Interactive dashboard to view workout plans
+- **AI-Powered Fitness Options**: The Fitness Options API leverages an intelligent agent to dynamically generate personalized fitness options (goals, equipment, workout types, experience levels) based on the user's age and previous selections. This ensures a highly customized onboarding experience.
+- **Dynamic Workout Generation**: Once a user's profile is set up, the Workout Generation API utilizes another intelligent agent to create a tailored 3-week workout plan. This plan is dynamically generated based on the user's specific fitness goals, available equipment, preferred workout types, and experience level, providing a truly personalized fitness journey.
 
-## Getting Started
-
-### Prerequisites
-
-- Python 3.x
-- Node.js and npm
-
-### Backend Setup
-
-1.  **Navigate to the backend directory:**
-    ```sh
-    cd backend
-    ```
-
-2.  **Create and activate a virtual environment:**
-    ```sh
-    python3 -m venv venv
-    source venv/bin/activate
-    ```
-
-3.  **Install dependencies:**
-    ```sh
-    pip install -r requirements.txt
-    ```
-
-3.  **Set up environment variables:**
-    Copy the example `.env.example` to `.env` and fill in the required values.
-
-4.  **Run database migrations:**
-    ```sh
-    flask db upgrade
-    ```
-
-5.  **Start the backend server:**
-    ```sh
-    python run.py
-    ```
-
-### Frontend Setup
-
-1.  **Navigate to the project root directory (if you are in the `backend` directory):**
-    ```sh
-    cd ..
-    ```
-
-2.  **Install dependencies:**
-    ```sh
-    npm install
-    ```
-
-3.  **Start the frontend development server:**
-    ```sh
-    npm run dev
-    ```
-
-## Technologies Used
-
-- **Backend:** Flask, Python
-- **Frontend:** React, Tailwind CSS
-- **Database:** SQLite (or as configured)
-
-
-
-
-- **Personalized User Profiles**: Users can create a detailed profile with their fitness goals, available equipment, preferred workout types, and experience level.
-- **Dynamic Workout Generation**: The backend uses a set of intelligent agents to create customized workout plans tailored to each user's profile.
 - **Interactive Frontend**: A responsive React frontend allows for easy profile setup and management.
 - **RESTful API**: A robust Flask backend provides a clear and scalable API for all application services.
+
+## AI/LLM Integration
+
+This application leverages cutting-edge AI and Large Language Models (LLMs) to provide highly personalized experiences:
+
+-   **Google Vertex AI**: The backend agents are deployed and managed on Google Vertex AI, ensuring scalable and robust AI inference.
+-   **Gemini 2.5**: Utilized for complex reasoning and generation tasks, such as creating detailed workout plans and nuanced fitness options.
+-   **Gemini 2.0 Flash Lite**: Employed for tasks requiring low-latency responses, ensuring a snappy and responsive user experience, especially during interactive fitness option selections.
 
 ## Tech Stack
 
 - **Frontend**: React, Vite, `react-router-dom`, Tailwind CSS
-- **Backend**: Python, Flask, SQLAlchemy, Alembic, Pydantic
+- **Backend**: Python, Flask, SQLAlchemy, Alembic, Pydantic, LangChain, Google GenAI
 
 ## Project Structure
 
@@ -168,13 +112,3 @@ The backend exposes the following RESTful endpoints:
 - `GET /api/profiles/<uuid>/workout-plan`: Retrieve the latest workout plan for a user.
 
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
