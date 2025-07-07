@@ -23,9 +23,24 @@ const ProfileSetup = () => {
     });
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [isUpdateMode, setIsUpdateMode] = useState(false);
 
-    const handleFetchOptions = useCallback(async () => {
-        if (!age || age <= 0) {
+        useEffect(() => {
+        const storedProfile = localStorage.getItem('profile');
+        if (storedProfile) {
+            const profile = JSON.parse(storedProfile);
+            setName(profile.name);
+            setAge(profile.age);
+            setIsUpdateMode(true);
+            // Pre-fetch options based on stored age
+            if (profile.age) {
+                handleFetchOptions(profile.age, profile);
+            }
+        }
+    }, []);
+
+    const handleFetchOptions = useCallback(async (currentAge, profileToLoad = null) => {
+        if (!currentAge || currentAge <= 0) {
             setError("Please enter a valid age.");
             return;
         }
@@ -33,18 +48,31 @@ const ProfileSetup = () => {
         setError(null);
         try {
             const response = await axios.post('http://localhost:5002/api/options', {
-                age: parseInt(age),
-                selections: [], // Always fetch a fresh set of options
+                age: parseInt(currentAge),
+                selections: [],
             });
             setOptions(response.data);
-            // Reset selections when new options are fetched
-            setSelections({ goals: [], equipment: [], workout: null, level: null });
+
+            if (profileToLoad) {
+                // Pre-select options based on the loaded profile
+                const { fitness_goals, equipment_options, workout_types, experience_levels } = response.data;
+                setSelections({
+                    goals: fitness_goals.filter(o => profileToLoad.fitnessGoal.includes(o.name)).map(o => o.id),
+                    equipment: equipment_options.filter(o => profileToLoad.equipment.includes(o.name)).map(o => o.id),
+                    workout: workout_types.find(o => profileToLoad.workoutTypes.includes(o.name))?.id || null,
+                    level: experience_levels.find(o => o.name === profileToLoad.experienceLevel)?.id || null,
+                });
+            } else {
+                // Reset selections only if not pre-loading a profile
+                setSelections({ goals: [], equipment: [], workout: null, level: null });
+            }
+
         } catch (err) {
             setError(err.response?.data?.error || 'Error fetching fitness options.');
         } finally {
             setIsLoading(false);
         }
-    }, [age]);
+    }, []);
 
     const handleSelect = useCallback((option, category) => {
         setSelections(prev => {
@@ -63,7 +91,7 @@ const ProfileSetup = () => {
         });
     }, []);
 
-    const handleSubmit = async () => {
+        const handleSubmit = async () => {
         const validationErrors = [];
         if (selections.goals.length < 1) validationErrors.push('Select at least 1 fitness goal.');
         if (!selections.workout) validationErrors.push('Select a workout type.');
@@ -87,12 +115,22 @@ const ProfileSetup = () => {
                 experienceLevel: options.experience_levels.find(o => o.id === selections.level)?.name || '',
             };
 
-            // Step 1: Create Profile
-            const profileResponse = await axios.post('http://localhost:5002/api/profile', profileData);
-            const { session_token, profile } = profileResponse.data;
+            let session_token = localStorage.getItem('sessionToken');
+            let profileResponse;
+
+            if (isUpdateMode && session_token) {
+                // Update existing profile
+                profileResponse = await axios.put(`http://localhost:5002/api/profiles/${session_token}`, profileData);
+            } else {
+                // Create new profile
+                profileResponse = await axios.post('http://localhost:5002/api/profile', profileData);
+                session_token = profileResponse.data.session_token;
+            }
+
+            const { profile } = profileResponse.data;
 
             if (!session_token) {
-                throw new Error('Failed to create profile session.');
+                throw new Error('Failed to create or update profile session.');
             }
 
             localStorage.setItem('sessionToken', session_token);
@@ -209,7 +247,7 @@ const ProfileSetup = () => {
                             className="w-full px-4 py-3 rounded-lg bg-white text-gray-900 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-500"
                         />
                         <button
-                            onClick={handleFetchOptions}
+                            onClick={() => handleFetchOptions(age)}
                             className="p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed flex-shrink-0"
                             disabled={!age || age <= 0 || isLoading}
                             aria-label="Fetch options"
@@ -280,10 +318,10 @@ const ProfileSetup = () => {
                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
-                            Creating Your Plan...
+                            isUpdateMode ? 'Updating Your Plan...' : 'Creating Your Plan...'
                         </>
                     ) : (
-                        'Create My Plan'
+                        isUpdateMode ? 'Update My Plan' : 'Create My Plan'
                     )}
                 </button>
             </div>

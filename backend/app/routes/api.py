@@ -39,7 +39,7 @@ def update_profile(profile_id):
         profile = fitness_profile_agent.update_profile(str(profile_id), profile_data)
         if not profile:
             return jsonify({'error': 'Profile not found'}), 404
-        return jsonify(profile)
+        return jsonify({'profile': profile})
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 

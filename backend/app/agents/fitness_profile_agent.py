@@ -23,13 +23,20 @@ class FitnessProfileAgent:
     def update_profile(profile_id, profile_data):
         """Update an existing user fitness profile."""
         try:
-            profile = UserProfile.query.get(profile_id)
+            profile = UserProfile.query.filter_by(uuid=profile_id).first()
             if not profile:
                 return None
 
+            key_map = {
+                'fitnessGoal': 'fitness_goal',
+                'workoutTypes': 'workout_types',
+                'experienceLevel': 'experience_level'
+            }
+
             for key, value in profile_data.items():
-                if hasattr(profile, key):
-                    setattr(profile, key, value)
+                db_key = key_map.get(key, key)
+                if hasattr(profile, db_key):
+                    setattr(profile, db_key, value)
 
             db.session.commit()
             return profile.to_dict()
