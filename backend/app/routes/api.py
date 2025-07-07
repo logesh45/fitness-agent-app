@@ -56,13 +56,20 @@ def generate_workout_plan(profile_id):
 @api.route('/profiles/<uuid:profile_id>/workout-plan', methods=['GET'])
 def get_latest_workout_plan(profile_id):
     try:
+        from ..models.user_profile import UserProfile
         from ..models.workout_plan import WorkoutPlan
-        plan = WorkoutPlan.query.filter_by(user_profile_id=str(profile_id)).order_by(WorkoutPlan.created_at.desc()).first()
+
+        profile = UserProfile.query.filter_by(uuid=str(profile_id)).first()
+        if not profile:
+            return jsonify({'error': 'Profile not found'}), 404
+
+        plan = WorkoutPlan.query.filter_by(user_profile_id=profile.id).order_by(WorkoutPlan.created_at.desc()).first()
         if not plan:
             return jsonify({'error': 'No workout plan found'}), 404
         return jsonify(plan.to_dict())
     except Exception as e:
         return jsonify({'error': str(e)}), 400
+
 
 @api.route('/profile', methods=['POST'])
 def create_user_profile():
@@ -73,7 +80,7 @@ def create_user_profile():
         profile_data = request.get_json()
         
         # Validate required fields
-        required_fields = ['name', 'age', 'fitness_goal', 'equipment', 'workout_types', 'experience_level']
+        required_fields = ['name', 'age', 'fitnessGoal', 'equipment', 'workoutTypes', 'experienceLevel']
         if not all(field in profile_data for field in required_fields):
             return jsonify({'error': 'Missing required fields'}), 400
             
@@ -114,41 +121,36 @@ def update_user_profile(session_token: str):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@api.route('/fitness-options', methods=['GET'])
-def get_fitness_selection_options():
+@api.route('/options', methods=['POST'])
+def get_dynamic_fitness_options():
     """
-    Returns personalized fitness options based on user's age and previous selections.
-    If no age is provided, returns default options.
+    Returns personalized fitness options based on user's age and previous selections,
+    sent via a POST request.
     """
     try:
-        # Get user's age from query parameters
-        user_age = request.args.get('age', type=int)
-        
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'Invalid JSON body'}), 400
+
+        user_age = data.get('age')
         if not user_age:
             return jsonify({'error': 'Age parameter is required'}), 400
             
-        # Get user's previous selections from query parameters
-        selections_json = request.args.get('selections')
-        user_selections = json.loads(selections_json) if selections_json else []
+        user_selections = data.get('selections', [])
         
-        # Generate personalized options using LLM
+        # Generate personalized options using the agent
         options = fitness_options_agent.generate_personalized_options(user_age, user_selections)
         return jsonify(options)
         
-    except json.JSONDecodeError as e:
-        return jsonify({
-            'error': 'Invalid selections format',
-            'details': str(e)
-        }), 400
     except ValidationError as e:
-        # Handle Pydantic validation errors
+        # Handle Pydantic validation errors from the agent
         return jsonify({
-            'error': 'Invalid response format from AI model',
+            'error': 'Invalid data structure from AI model',
             'details': str(e)
         }), 500
     except Exception as e:
-        # Handle other errors
-        print(f"Error in get_fitness_selection_options: {str(e)}")  # Add debug logging
+        # Handle other potential errors
+        print(f"Error in /options endpoint: {str(e)}")
         return jsonify({
             'error': 'Failed to generate fitness options',
             'details': str(e)

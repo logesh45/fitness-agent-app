@@ -3,378 +3,289 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-// Debounce utility function
-const useDebounce = (value, delay) => {
-    const [debouncedValue, setDebouncedValue] = useState(value);
 
-    useEffect(() => {
-        const handler = setTimeout(() => {
-            setDebouncedValue(value);
-        }, delay);
-
-        return () => {
-            clearTimeout(handler);
-        };
-    }, [value, delay]);
-
-    return debouncedValue;
-};
 
 const ProfileSetup = () => {
     const navigate = useNavigate();
     const [name, setName] = useState('');
     const [age, setAge] = useState('');
-    const [selectedOptions, setSelectedOptions] = useState([]);
-    const [fitnessGoals, setFitnessGoals] = useState([]);
-    const [equipmentOptions, setEquipmentOptions] = useState([]);
-    const [workoutTypes, setWorkoutTypes] = useState([]);
-    const [experienceLevels, setExperienceLevels] = useState([]);
-    const [showOptions, setShowOptions] = useState(false);
-    const [isEditingAge, setIsEditingAge] = useState(false);
-    const [isNameEntered, setIsNameEntered] = useState(false);
-    const [loading, setLoading] = useState(false);
+    const [selections, setSelections] = useState({
+        goals: [],
+        equipment: [],
+        workout: null,
+        level: null,
+    });
+    const [options, setOptions] = useState({
+        fitness_goals: [],
+        equipment_options: [],
+        workout_types: [],
+        experience_levels: [],
+    });
     const [error, setError] = useState(null);
-    const containerRef = useRef(null);
+    const [isLoading, setIsLoading] = useState(false);
 
-    // Debounce selections for API calls
-    const debouncedSelections = useDebounce(selectedOptions, 3000);
-
-    // Handle name submit
-    const handleNameSubmit = () => {
-        if (name.trim()) {
-            setIsNameEntered(true);
+    const handleFetchOptions = useCallback(async () => {
+        if (!age || age <= 0) {
+            setError("Please enter a valid age.");
+            return;
         }
-    };
+        setIsLoading(true);
+        setError(null);
+        try {
+            const response = await axios.post('http://localhost:5002/api/options', {
+                age: parseInt(age),
+                selections: [], // Always fetch a fresh set of options
+            });
+            setOptions(response.data);
+            // Reset selections when new options are fetched
+            setSelections({ goals: [], equipment: [], workout: null, level: null });
+        } catch (err) {
+            setError(err.response?.data?.error || 'Error fetching fitness options.');
+        } finally {
+            setIsLoading(false);
+        }
+    }, [age]);
 
-    // Handle age change
-    const handleAgeChange = (e) => {
-        setAge(e.target.value);
-        setIsEditingAge(true);
-    };
+    const handleSelect = useCallback((option, category) => {
+        setSelections(prev => {
+            const newSelections = { ...prev };
+            if (category === 'level' || category === 'workout') {
+                newSelections[category] = prev[category] === option.id ? null : option.id;
+            } else {
+                const current = prev[category];
+                if (current.includes(option.id)) {
+                    newSelections[category] = current.filter(id => id !== option.id);
+                } else {
+                    newSelections[category] = [...current, option.id];
+                }
+            }
+            return newSelections;
+        });
+    }, []);
 
-    // Handle continue button click
-    const handleContinue = async () => {
-        if (!age || isNaN(age) || age < 0) {
-            setError('Please enter a valid age');
+    const handleSubmit = async () => {
+        const validationErrors = [];
+        if (selections.goals.length < 1) validationErrors.push('Select at least 1 fitness goal.');
+        if (!selections.workout) validationErrors.push('Select a workout type.');
+        if (!selections.level) validationErrors.push('Select an experience level.');
+
+        if (validationErrors.length > 0) {
+            setError(validationErrors.join(' '));
             return;
         }
         
-        setLoading(true);
+        setIsLoading(true);
         setError(null);
-        try {
-            const response = await axios.get(`http://localhost:5002/api/fitness-options?age=${age}`);
-            setFitnessGoals(response.data.fitness_goals);
-            setEquipmentOptions(response.data.equipment_options);
-            setWorkoutTypes(response.data.workout_types);
-            setExperienceLevels(response.data.experience_levels);
-            setShowOptions(true);
-            setIsEditingAge(false);
-        } catch (err) {
-            setError('Failed to fetch fitness options. Please try again.');
-            console.error('Error fetching options:', err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // Effect for handling selection changes
-    useEffect(() => {
-        const fetchOptions = async () => {
-            if (!showOptions || !age) return;
-            
-            setLoading(true);
-            setError(null);
-            try {
-                const queryParams = new URLSearchParams({
-                    age: age
-                });
-
-                if (debouncedSelections.length > 0) {
-                    const selectedOptionsData = debouncedSelections.map(id => {
-                        const option = fitnessGoals.find(opt => opt.id === id) ||
-                                     equipmentOptions.find(opt => opt.id === id) ||
-                                     workoutTypes.find(opt => opt.id === id) ||
-                                     experienceLevels.find(opt => opt.id === id);
-                        if (option) {
-                            let type = '';
-                            if (fitnessGoals.find(opt => opt.id === id)) type = 'goal';
-                            else if (equipmentOptions.find(opt => opt.id === id)) type = 'equipment';
-                            else if (workoutTypes.find(opt => opt.id === id)) type = 'workout';
-                            else if (experienceLevels.find(opt => opt.id === id)) type = 'level';
-
-                            return {
-                                id: option.id,
-                                name: option.name,
-                                type: type
-                            };
-                        }
-                        return null;
-                    }).filter(Boolean);
-
-                    queryParams.append('selections', JSON.stringify(selectedOptionsData));
-                }
-                
-                const response = await axios.get(`http://localhost:5002/api/fitness-options?${queryParams}`);
-                
-                setFitnessGoals(response.data.fitness_goals);
-                setEquipmentOptions(response.data.equipment_options);
-                setWorkoutTypes(response.data.workout_types);
-                setExperienceLevels(response.data.experience_levels);
-            } catch (err) {
-                setError('Failed to fetch fitness options. Please try again.');
-                console.error('Error fetching options:', err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchOptions();
-    }, [debouncedSelections, showOptions]);
-
-    // Selection Handler
-    const handleOptionSelect = useCallback(
-        (optionId, optionType) => {
-            setSelectedOptions((prevSelectedOptions) => {
-                if (prevSelectedOptions.includes(optionId)) {
-                    return prevSelectedOptions.filter((id) => id !== optionId);
-                } else {
-                    // For experience levels, remove any previously selected level
-                    if (optionType === 'level') {
-                        const newSelections = prevSelectedOptions.filter(id => {
-                            const option = fitnessGoals.find(opt => opt.id === id) ||
-                                         equipmentOptions.find(opt => opt.id === id) ||
-                                         workoutTypes.find(opt => opt.id === id) ||
-                                         experienceLevels.find(opt => opt.id === id);
-                            return option?.type !== 'level';
-                        });
-                        return [...newSelections, optionId];
-                    }
-                    return [...prevSelectedOptions, optionId];
-                }
-            });
-        },
-        [fitnessGoals, equipmentOptions, workoutTypes, experienceLevels]
-    );
-
-    // Handle form submission
-    const handleSubmit = async () => {
-        if (!name || !age || selectedOptions.length < 3) {
-            setError('Please fill in all the required fields and select at least 3 options.');
-            return;
-        }
 
         try {
             const profileData = {
                 name,
                 age: parseInt(age),
-                selectedOptions: selectedOptions.map(id => {
-                    const option = fitnessGoals.find(opt => opt.id === id) ||
-                                 equipmentOptions.find(opt => opt.id === id) ||
-                                 workoutTypes.find(opt => opt.id === id) ||
-                                 experienceLevels.find(opt => opt.id === id);
-                    return {
-                        id: option.id,
-                        name: option.name,
-                        type: option.type
-                    };
-                })
+                fitnessGoal: options.fitness_goals.find(o => o.id === selections.goals[0])?.name || '',
+                equipment: options.equipment_options.filter(o => selections.equipment.includes(o.id)).map(o => o.name),
+                workoutTypes: [options.workout_types.find(o => o.id === selections.workout)?.name].filter(Boolean),
+                experienceLevel: options.experience_levels.find(o => o.id === selections.level)?.name || '',
             };
 
-            const response = await axios.post('http://localhost:5002/api/profile', profileData);
-            console.log('Profile created:', response.data);
-            
-            if (response.data.session_token) {
-                sessionStorage.setItem('sessionToken', response.data.session_token);
-                sessionStorage.setItem('profile', JSON.stringify(response.data.profile));
-                navigate('/dashboard');
+            // Step 1: Create Profile
+            const profileResponse = await axios.post('http://localhost:5002/api/profile', profileData);
+            const { session_token, profile } = profileResponse.data;
+
+            if (!session_token) {
+                throw new Error('Failed to create profile session.');
             }
+
+            localStorage.setItem('sessionToken', session_token);
+            localStorage.setItem('profile', JSON.stringify(profile));
+
+            // Step 2: Generate Workout Plan
+            const workoutResponse = await axios.post(`http://localhost:5002/api/profiles/${session_token}/workout-plan`);
+            localStorage.setItem('workoutPlan', JSON.stringify(workoutResponse.data));
+            
+            // Step 3: Navigate to dashboard
+            navigate('/dashboard');
+
         } catch (err) {
-            setError(err.response?.data?.error || 'Error creating profile. Please try again.');
+            const errorMessage = err.response?.data?.error || 'An unexpected error occurred. Please try again.';
+            setError(errorMessage);
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    const getChipStyle = (optionId, optionType) => {
-        const isSelected = selectedOptions.includes(optionId);
-        const isExperienceLevel = optionType === 'level';
-        
-        // Base styles
-        const baseStyles = "px-4 py-2 rounded-full transition-colors duration-300 font-medium text-sm m-1 whitespace-nowrap";
-        
-        // Selected styles
-        const selectedStyles = "bg-orange-500 text-white border-2 border-orange-500/50 shadow-lg";
-        
-        // Unselected styles for experience levels (disabled if another level is selected)
-        const unselectedLevelStyles = selectedOptions.some(id => {
-            const option = experienceLevels.find(opt => opt.id === id);
-            return option && id !== optionId;
-        }) && isExperienceLevel
-            ? "bg-white/5 text-gray-400 border border-white/10 cursor-not-allowed"
-            : "bg-white/10 text-white border border-white/20 hover:bg-white/20 hover:scale-105";
-        
-        // Unselected styles for other options
-        const unselectedStyles = "bg-white/10 text-white border border-white/20 hover:bg-white/20 hover:scale-105";
-        
-        return `${baseStyles} ${isSelected ? selectedStyles : (isExperienceLevel ? unselectedLevelStyles : unselectedStyles)} truncate`;
+    const OptionChip = ({ option, isSelected, onSelect, category }) => {
+        const [isHovered, setIsHovered] = useState(false);
+        const popoverContent = [
+            option.description,
+            option.age_specific_notes && `Notes for age ${age}: ${option.age_specific_notes}`,
+            option.safety_considerations && `Safety: ${option.safety_considerations}`,
+            option.intensity_recommendation && `Intensity: ${option.intensity_recommendation}`,
+            option.progression_timeline && `Progression: ${option.progression_timeline}`,
+        ].filter(Boolean).join('\n\n');
+
+        return (
+            <motion.div
+                className="relative"
+                onHoverStart={() => setIsHovered(true)}
+                onHoverEnd={() => setIsHovered(false)}
+            >
+                <button
+                    onClick={() => onSelect(option, category)}
+                    className={`px-4 py-2 rounded-full transition-colors duration-300 font-medium text-sm m-1 whitespace-nowrap ${isSelected
+                        ? 'bg-blue-600 text-white border-2 border-blue-600/50 shadow-lg'
+                        : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100 hover:scale-105'} truncate`}
+                >
+                    {option.name}
+                </button>
+                <AnimatePresence>
+                    {isHovered && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                            transition={{ duration: 0.2 }}
+                            className="absolute bottom-full mb-2 w-72 p-3 bg-white text-gray-800 text-sm rounded-lg shadow-xl border border-gray-200 z-50"
+                            style={{ left: '50%', transform: 'translateX(-50%)', whiteSpace: 'pre-wrap' }}
+                        >
+                            {popoverContent}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </motion.div>
+        );
     };
 
-    const renderOptions = (options, title) => (
-        <motion.div 
-            className="mb-8"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-        >
-            <h2 className="text-xl font-semibold text-white mb-4">{title}</h2>
-            <div className="flex flex-wrap">
-                {options.map((option) => (
-                    <motion.button
+    const OptionsSection = ({ title, options, selection, onSelect, category, selectionRule }) => (
+        <div className="mb-8">
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">{title}</h2>
+            <p className="text-sm text-gray-500 mb-4">{selectionRule}</p>
+            <div className="flex flex-wrap p-4 rounded-lg bg-gray-200/50 min-h-[60px] items-start -m-1">
+                {options && options.length > 0 ? options.map(option => (
+                    <OptionChip
                         key={option.id}
-                        onClick={() => handleOptionSelect(option.id, option.type)}
-                        initial={{ scale: 0.8, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        whileTap={{ scale: 0.95 }}
-                        className={getChipStyle(option.id, option.type)}
-                    >
-                        {option.name}
-                    </motion.button>
-                ))}
+                        option={option}
+                        isSelected={category === 'level' || category === 'workout' ? selection === option.id : selection.includes(option.id)}
+                        onSelect={onSelect}
+                        category={category}
+                    />
+                )) : <p className="text-gray-500 p-1">Please enter your age and fetch options.</p>}
             </div>
-        </motion.div>
+        </div>
     );
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-purple-900 to-indigo-900 flex flex-col items-center justify-start pt-10 pb-10">
-            <div className="w-full max-w-2xl px-4">
-                <motion.h1 
-                    className="text-3xl font-semibold text-white mb-6 text-center"
-                    animate={{ 
-                        fontSize: showOptions ? '1.5rem' : '1.875rem',
-                        marginBottom: showOptions ? '1rem' : '1.5rem'
-                    }}
-                    transition={{ duration: 0.5 }}
-                >
+        <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-start pt-10 pb-10">
+            <div className="w-full max-w-3xl px-4">
+                <h1 className="text-3xl font-semibold text-gray-900 mb-6 text-center">
                     Fitness Profile Setup
-                </motion.h1>
+                </h1>
 
-                <motion.div 
-                    className="flex flex-col items-center"
-                    animate={{ 
-                        marginBottom: showOptions ? '2rem' : '0',
-                        alignItems: showOptions ? 'flex-start' : 'center'
-                    }}
-                    transition={{ duration: 0.5 }}
-                >
-                    {!isNameEntered ? (
-                        <motion.div 
-                            className="mb-6 w-full max-w-md"
-                            initial={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
+                {/* Name and Age Inputs */}
+                <div className="mb-6">
+                    <label htmlFor="name" className="block text-gray-600 text-sm font-bold mb-2">
+                        Name
+                    </label>
+                    <input
+                        type="text"
+                        id="name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Enter your name"
+                        className="w-full px-4 py-3 rounded-lg bg-white text-gray-900 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-500"
+                    />
+                </div>
+
+                <div className="mb-6">
+                    <label htmlFor="age" className="block text-gray-600 text-sm font-bold mb-2">
+                        Age
+                    </label>
+                    <div className="flex items-center space-x-2">
+                        <input
+                            type="number"
+                            id="age"
+                            value={age}
+                            onChange={(e) => setAge(e.target.value ? parseInt(e.target.value, 10) : '')}
+                            placeholder="Enter your age to get options"
+                            className="w-full px-4 py-3 rounded-lg bg-white text-gray-900 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-500"
+                        />
+                        <button
+                            onClick={handleFetchOptions}
+                            className="p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed flex-shrink-0"
+                            disabled={!age || age <= 0 || isLoading}
+                            aria-label="Fetch options"
                         >
-                            <label htmlFor="name" className="block text-gray-300 text-sm font-bold mb-2 text-white">
-                                What's your name?
-                            </label>
-                            <div className="flex">
-                                <input
-                                    type="text"
-                                    id="name"
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    onKeyPress={(e) => e.key === 'Enter' && handleNameSubmit()}
-                                    placeholder="Enter your name"
-                                    className="flex-1 px-4 py-3 rounded-l-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent placeholder:text-gray-400"
-                                />
-                                <button
-                                    onClick={handleNameSubmit}
-                                    className="px-4 py-3 rounded-r-lg bg-orange-500 text-white hover:bg-orange-600 transition-colors duration-300"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </motion.div>
-                    ) : (
-                        <motion.div 
-                            className={`flex flex-wrap gap-4 items-center ${showOptions ? 'w-full' : 'justify-center'}`}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ duration: 0.5 }}
-                        >
-                            <motion.div 
-                                className="text-white text-xl font-semibold"
-                                animate={{ 
-                                    fontSize: showOptions ? '1rem' : '1.25rem',
-                                }}
-                            >
-                                Hi, {name}!
-                            </motion.div>
-                            <motion.div className="flex items-center gap-4">
-                                <div className="relative">
-                                    <input
-                                        type="number"
-                                        value={age}
-                                        onChange={handleAgeChange}
-                                        placeholder="Age"
-                                        className="w-24 px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent placeholder:text-gray-400"
-                                    />
-                                </div>
-                                {(isEditingAge || !showOptions) && (
-                                    <motion.button
-                                        onClick={handleContinue}
-                                        className="px-4 py-2 rounded-lg bg-orange-500 text-white hover:bg-orange-600 transition-colors duration-300 flex items-center gap-2"
-                                        initial={{ opacity: 0, x: -20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, x: 20 }}
-                                    >
-                                        Continue
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                        </svg>
-                                    </motion.button>
-                                )}
-                            </motion.div>
-                        </motion.div>
-                    )}
-                </motion.div>
+                            {isLoading ? (
+                                <svg className="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            ) : (
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                </svg>
+                            )}
+                        </button>
+                    </div>
+                </div>
+
+                {/* Sections for options */}
+                <OptionsSection
+                    title="Fitness Goals"
+                    options={options.fitness_goals}
+                    selection={selections.goals}
+                    onSelect={handleSelect}
+                    category="goals"
+                    selectionRule="Select at least 1"
+                />
+                <OptionsSection
+                    title="Equipment Options"
+                    options={options.equipment_options}
+                    selection={selections.equipment}
+                    onSelect={handleSelect}
+                    category="equipment"
+                    selectionRule="Select any equipment you have. (Optional)"
+                />
+                <OptionsSection
+                    title="Workout Type"
+                    options={options.workout_types}
+                    selection={selections.workout}
+                    onSelect={handleSelect}
+                    category="workout"
+                    selectionRule="Select 1"
+                />
+                <OptionsSection
+                    title="Experience Level"
+                    options={options.experience_levels}
+                    selection={selections.level}
+                    onSelect={handleSelect}
+                    category="level"
+                    selectionRule="Select 1"
+                />
 
                 {error && (
-                    <motion.div 
-                        className="mb-6 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded"
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                    >
+                    <div className="mb-6 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
                         {error}
-                    </motion.div>
-                )}
-
-                {loading && (
-                    <div className="flex justify-center items-center w-full">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
                     </div>
                 )}
 
-                {showOptions && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.2 }}
-                    >
-                        {renderOptions(fitnessGoals, 'Fitness Goals')}
-                        {renderOptions(equipmentOptions, 'Equipment Options')}
-                        {renderOptions(workoutTypes, 'Workout Types')}
-                        {renderOptions(experienceLevels, 'Experience Levels')}
-
-                        <motion.button
-                            onClick={handleSubmit}
-                            className="w-full py-3 rounded-full bg-orange-500 text-white font-semibold transition-colors duration-300 hover:bg-orange-600"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.5 }}
-                        >
-                            Create Profile
-                        </motion.button>
-                    </motion.div>
-                )}
+                {/* Submit Button */}
+                <button
+                    onClick={handleSubmit}
+                    className="w-full py-3 rounded-full bg-blue-600 text-white font-semibold transition-colors duration-300 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center"
+                    disabled={isLoading}
+                >
+                    {isLoading ? (
+                        <>
+                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Creating Your Plan...
+                        </>
+                    ) : (
+                        'Create My Plan'
+                    )}
+                </button>
             </div>
         </div>
     );

@@ -1,4 +1,103 @@
-# React + Vite
+# Personalized Fitness App
+
+This is a full-stack web application that generates personalized workout plans for users based on their individual profiles, goals, and preferences.
+
+## Key Features
+
+- **Personalized User Profiles**: Users can create a detailed profile with their fitness goals, available equipment, preferred workout types, and experience level.
+- **Dynamic Workout Generation**: The backend uses a set of intelligent agents to create customized workout plans tailored to each user's profile.
+- **Interactive Frontend**: A responsive React frontend allows for easy profile setup and management.
+- **RESTful API**: A robust Flask backend provides a clear and scalable API for all application services.
+
+## Tech Stack
+
+- **Frontend**: React, Vite, `react-router-dom`, Tailwind CSS
+- **Backend**: Python, Flask, SQLAlchemy, Alembic, Pydantic
+
+## Project Structure
+
+```
+/fitness-app
+├── backend/         # Flask API and business logic
+│   ├── app/         # Core application files, including routes and agents
+│   ├── migrations/  # Database migration scripts
+│   ├── run.py       # Application entry point
+│   └── requirements.txt
+├── src/             # React frontend source code
+│   ├── components/  # Reusable React components
+│   ├── App.jsx      # Main application component with routing
+│   └── main.jsx     # Frontend entry point
+├── package.json
+└── README.md
+```
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js & npm
+- Python 3.x & pip
+
+### Backend Setup
+
+1.  **Navigate to the backend directory:**
+    ```sh
+    cd backend
+    ```
+
+2.  **Create and activate a virtual environment:**
+    ```sh
+    python -m venv venv
+    source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+    ```
+
+3.  **Install dependencies:**
+    ```sh
+    pip install -r requirements.txt
+    ```
+
+4.  **Set up environment variables:**
+    Copy the example `.env.example` to `.env` and fill in the required values.
+
+5.  **Run database migrations:**
+    ```sh
+    flask db upgrade
+    ```
+
+6.  **Start the backend server:**
+    ```sh
+    python run.py
+    ```
+
+### Frontend Setup
+
+1.  **Navigate to the root directory:**
+    ```sh
+    cd ..
+    ```
+
+2.  **Install dependencies:**
+    ```sh
+    npm install
+    ```
+
+3.  **Start the frontend development server:**
+    ```sh
+    npm run dev
+    ```
+
+The application should now be running and accessible in your browser.
+
+## API Endpoints
+
+The backend exposes the following RESTful endpoints:
+
+- `POST /api/profiles`: Create a new user profile.
+- `GET /api/profiles/<uuid>`: Retrieve a user profile by ID.
+- `PUT /api/profiles/<uuid>`: Update an existing user profile.
+- `POST /api/profiles/<uuid>/workout-plan`: Generate a new workout plan for a user.
+- `GET /api/profiles/<uuid>/workout-plan`: Retrieve the latest workout plan for a user.
+
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 

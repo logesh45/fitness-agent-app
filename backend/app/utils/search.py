@@ -18,7 +18,7 @@ if PROJECT_ID == "your-default-project-id":
 
 LOCATION = os.environ.get("GOOGLE_CLOUD_LOCATION", "us-central1")  # Set your default location
 
-model_id = "gemini-2.0-flash-001"
+model_id = "gemini-2.5-flash"
 
 google_search_tool = Tool(
     google_search = GoogleSearch()
@@ -81,7 +81,7 @@ def generate_structured_workout_plan(profile):
         profile: UserProfile object containing user preferences and details
     """
     # Connect to Google Cloud resources
-    llm = VertexAI(model_name="gemini-2.0-flash-001", location=LOCATION)
+    llm = VertexAI(model_name="gemini-2.5-flash", location=LOCATION)
     
     # Create parser for structured output
     parser = JsonOutputParser(pydantic_object=WorkoutPlanData)

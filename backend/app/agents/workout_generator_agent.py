@@ -8,7 +8,7 @@ class WorkoutGeneratorAgent:
     @staticmethod
     def generate_workout_plan(profile_id):
         """Generate a 3-week workout plan based on user profile."""
-        profile = UserProfile.query.get(profile_id)
+        profile = UserProfile.query.filter_by(uuid=profile_id).first()
         if not profile:
             raise ValueError("Profile not found")
 
@@ -20,7 +20,7 @@ class WorkoutGeneratorAgent:
         end_date = start_date + timedelta(weeks=3)
         
         workout_plan = WorkoutPlan(
-            user_profile_id=profile_id,
+            user_profile_id=profile.id,
             start_date=start_date,
             end_date=end_date,
             plan_data=plan_data

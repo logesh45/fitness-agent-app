@@ -21,7 +21,7 @@ LOCATION = os.environ.get("GOOGLE_CLOUD_LOCATION", "us-central1")
 class FitnessOptionsAgent:
     def __init__(self):
         # Initialize Vertex AI
-        self.llm = VertexAI(model_name="gemini-2.0-flash-001", location=LOCATION)
+        self.llm = VertexAI(model_name="gemini-2.0-flash-lite", location=LOCATION)
         
         # Create parser for structured output
         self.parser = JsonOutputParser(pydantic_object=FitnessOptions)
