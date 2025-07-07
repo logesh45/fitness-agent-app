@@ -136,7 +136,7 @@ const Dashboard = () => {
                     <p className="text-lg text-gray-600 mb-6">Here is your personalized workout plan.</p>
 
                     {/* Week Tabs */}
-                <div className="flex border-b border-gray-200 mb-4">
+                <div className="flex justify-center border-b border-gray-200 mb-4">
                     {workoutPlan.plan_data.weeks.map((week, index) => (
                         <button
                             key={index}
